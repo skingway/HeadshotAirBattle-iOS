@@ -59,7 +59,7 @@ struct RoomLobbyView: View {
         .onAppear {
             viewModel.listenToGame(gameId: gameId, userId: appViewModel.userId)
         }
-        .onChange(of: viewModel.shouldNavigateToGame) { _, shouldNavigate in
+        .onChange(of: viewModel.shouldNavigateToGame) { shouldNavigate in
             if shouldNavigate {
                 navigationPath.removeLast()
                 navigationPath.append(AppRoute.onlineGame(gameId: gameId))

@@ -22,7 +22,7 @@ struct GameLogView: View {
                     }
                 }
                 .frame(height: 60)
-                .onChange(of: logs.count) { _, _ in
+                .onChange(of: logs.count) { _ in
                     if let last = logs.indices.last {
                         withAnimation {
                             proxy.scrollTo(last, anchor: .bottom)

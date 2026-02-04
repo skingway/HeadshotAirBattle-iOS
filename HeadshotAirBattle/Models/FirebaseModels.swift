@@ -169,13 +169,13 @@ struct Statistics: Codable {
     var onlineGames: Int?
     var currentStreak: Int?
 
-    init() {
-        self.totalGames = 0
-        self.wins = 0
-        self.losses = 0
-        self.winRate = 0
-        self.onlineGames = nil
-        self.currentStreak = 0
+    init(totalGames: Int = 0, wins: Int = 0, losses: Int = 0, winRate: Double = 0, onlineGames: Int? = nil, currentStreak: Int? = 0) {
+        self.totalGames = totalGames
+        self.wins = wins
+        self.losses = losses
+        self.winRate = winRate
+        self.onlineGames = onlineGames
+        self.currentStreak = currentStreak
     }
 }
 

@@ -102,12 +102,19 @@ class MatchmakingService {
             )
 
             // Atomic update both queue entries
-            try await db.runTransaction { [self] transaction, _ in
+            try await db.runTransaction { [self] transaction, errorPointer in
                 let myRef = self.db.collection("matchmakingQueue").document(userId)
                 let opRef = self.db.collection("matchmakingQueue").document(opponentId)
 
-                let myDoc = try transaction.getDocument(myRef)
-                let opDoc = try transaction.getDocument(opRef)
+                let myDoc: DocumentSnapshot
+                let opDoc: DocumentSnapshot
+                do {
+                    myDoc = try transaction.getDocument(myRef)
+                    opDoc = try transaction.getDocument(opRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    return nil
+                }
 
                 guard myDoc.data()?["status"] as? String == "waiting",
                       opDoc.data()?["status"] as? String == "waiting" else {

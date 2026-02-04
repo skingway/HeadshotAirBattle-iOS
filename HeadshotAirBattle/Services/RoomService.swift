@@ -55,7 +55,7 @@ class RoomService {
         try await roomRef.setValue(roomData)
 
         // Auto-delete on disconnect
-        roomRef.onDisconnectRemoveValue()
+        try await roomRef.onDisconnectRemoveValue()
 
         return (gameId, roomCode)
     }

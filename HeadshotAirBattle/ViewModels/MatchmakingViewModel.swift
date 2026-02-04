@@ -82,12 +82,19 @@ class MatchmakingViewModel: ObservableObject {
             let opponentId = opponent.documentID
             let gameId = "game_\(Int(Date().timeIntervalSince1970 * 1000))_\(Int.random(in: 1000...9999))"
 
-            try await db.runTransaction { transaction, _ in
+            try await db.runTransaction { transaction, errorPointer in
                 let myRef = self.db.collection("matchmakingQueue").document(self.userId)
                 let opRef = self.db.collection("matchmakingQueue").document(opponentId)
 
-                let myDoc = try transaction.getDocument(myRef)
-                let opDoc = try transaction.getDocument(opRef)
+                let myDoc: DocumentSnapshot
+                let opDoc: DocumentSnapshot
+                do {
+                    myDoc = try transaction.getDocument(myRef)
+                    opDoc = try transaction.getDocument(opRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    return nil
+                }
 
                 guard myDoc.data()?["status"] as? String == "waiting",
                       opDoc.data()?["status"] as? String == "waiting" else {

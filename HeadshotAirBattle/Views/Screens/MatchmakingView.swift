@@ -52,7 +52,7 @@ struct MatchmakingView: View {
         .onDisappear {
             viewModel.cleanup()
         }
-        .onChange(of: viewModel.matchedGameId) { _, gameId in
+        .onChange(of: viewModel.matchedGameId) { gameId in
             if let gameId = gameId {
                 navigationPath.removeLast()
                 navigationPath.append(AppRoute.onlineGame(gameId: gameId))

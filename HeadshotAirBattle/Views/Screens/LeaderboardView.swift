@@ -45,7 +45,7 @@ struct LeaderboardView: View {
         .task {
             await viewModel.loadLeaderboard()
         }
-        .onChange(of: viewModel.selectedTab) { _, _ in
+        .onChange(of: viewModel.selectedTab) { _ in
             Task { await viewModel.loadLeaderboard() }
         }
     }

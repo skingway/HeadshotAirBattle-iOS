@@ -69,8 +69,8 @@ struct CustomModeView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: boardSize) { _, _ in validate() }
-        .onChange(of: airplaneCount) { _, _ in validate() }
+        .onChange(of: boardSize) { _ in validate() }
+        .onChange(of: airplaneCount) { _ in validate() }
     }
 
     private func validate() {

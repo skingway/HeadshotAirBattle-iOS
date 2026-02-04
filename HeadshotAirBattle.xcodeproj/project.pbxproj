@@ -56,6 +56,7 @@
 		BF31F2CBE35CDC2245707026 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F59563454061AC857C79FAE /* Assets.xcassets */; };
 		CFB30B3B92B3420FB0D27431 /* GameLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E68164DA03AB0ABE1A379088 /* GameLogView.swift */; };
 		D09E0EF0BC1A535B31225300 /* BoardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A37A7381434D40784278A0 /* BoardManager.swift */; };
+		D2325A29CBD346C8E19214FD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D58977D4E0614E9961351939 /* GoogleService-Info.plist */; };
 		DA017C7E7A8D49498CE6D951 /* AirplaneShapeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215227CF8B449D916B94D820 /* AirplaneShapeView.swift */; };
 		DB6DE39F0787058331C67CEE /* FirebaseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC2C721A5115ED54D9D576CA /* FirebaseModels.swift */; };
 		DD8A36B0BAA1F7E28EEE3F15 /* TurnTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A9B3FA2C2D4A32C9C20E2 /* TurnTimerView.swift */; };
@@ -137,6 +138,7 @@
 		CC9D49597A2B3ACD1383905F /* AIStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIStrategy.swift; sourceTree = "<group>"; };
 		D00C70CFAF1C0482A97B569E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		D46FB4E16E154C0367A85342 /* SkinsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinsViewModel.swift; sourceTree = "<group>"; };
+		D58977D4E0614E9961351939 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DA6B32CAC4278FF1C166005D /* MatchmakingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchmakingViewModel.swift; sourceTree = "<group>"; };
 		DC8145532F9F4BF11AE73975 /* MatchmakingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchmakingService.swift; sourceTree = "<group>"; };
 		DCCF2C4E0D008CDC5710F7B9 /* CoordinateSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinateSystem.swift; sourceTree = "<group>"; };
@@ -312,6 +314,7 @@
 			isa = PBXGroup;
 			children = (
 				3F59563454061AC857C79FAE /* Assets.xcassets */,
+				D58977D4E0614E9961351939 /* GoogleService-Info.plist */,
 				5731DDC35A64D28FE984D597 /* Info.plist */,
 			);
 			path = Resources;
@@ -388,8 +391,8 @@
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					2A1075D63D97CA70F62EA674 = {
-						DevelopmentTeam = "";
-						ProvisioningStyle = Automatic;
+						DevelopmentTeam = 8J6A847P66;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -422,6 +425,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF31F2CBE35CDC2245707026 /* Assets.xcassets in Resources */,
+				D2325A29CBD346C8E19214FD /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -516,10 +520,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 8J6A847P66;
 				INFOPLIST_FILE = HeadshotAirBattle/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -527,7 +531,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.headshotairbattle.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.headshotairbattle;
+				PROVISIONING_PROFILE_SPECIFIER = "com.headshotairbattle Development";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -690,10 +695,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 8J6A847P66;
 				INFOPLIST_FILE = HeadshotAirBattle/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -701,7 +706,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.headshotairbattle.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.headshotairbattle;
+				PROVISIONING_PROFILE_SPECIFIER = "com.headshotairbattle Development";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
