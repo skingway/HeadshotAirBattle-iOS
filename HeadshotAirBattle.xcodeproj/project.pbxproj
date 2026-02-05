@@ -50,6 +50,7 @@
 		B1D73DD47C48EF32375B008D /* MultiplayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B105B3B5D34644ACAE778734 /* MultiplayerService.swift */; };
 		B383F69F372065E7BACB6E81 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0787E7D422400E687685190 /* AuthService.swift */; };
 		B498F76006B3074700AFB5C3 /* OnlineGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 540B3889012A36ABE9A0C45E /* OnlineGameView.swift */; };
+		B6C9906BCAF76048014A7996 /* SinglePlayerSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D93CB8E4BC850F57216A4 /* SinglePlayerSetupView.swift */; };
 		B8113550395814D7C9165112 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 735E77B78D02F16B9EFEFC58 /* FirebaseAuth */; };
 		B88B88F2827FF41679BB49B3 /* RoomLobbyViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEA6EE82C36B953DE7F090D /* RoomLobbyViewModel.swift */; };
 		BCA3738C9CC26AB2080F9C83 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00C70CFAF1C0482A97B569E /* SettingsView.swift */; };
@@ -133,6 +134,7 @@
 		C0787E7D422400E687685190 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		C2113E2EB0494D0C4AF1A170 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		C4E7ABBB0ED8791B00545361 /* CustomModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomModeView.swift; sourceTree = "<group>"; };
+		C55D93CB8E4BC850F57216A4 /* SinglePlayerSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SinglePlayerSetupView.swift; sourceTree = "<group>"; };
 		C7BC5767406DAC7CBC797FDC /* HeadshotAirBattleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadshotAirBattleApp.swift; sourceTree = "<group>"; };
 		CC2C721A5115ED54D9D576CA /* FirebaseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseModels.swift; sourceTree = "<group>"; };
 		CC9D49597A2B3ACD1383905F /* AIStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIStrategy.swift; sourceTree = "<group>"; };
@@ -262,6 +264,7 @@
 				EDD10FC52CFC823ABBADB0DD /* ProfileView.swift */,
 				E25DBE4670843A8C107E3465 /* RoomLobbyView.swift */,
 				D00C70CFAF1C0482A97B569E /* SettingsView.swift */,
+				C55D93CB8E4BC850F57216A4 /* SinglePlayerSetupView.swift */,
 				454B1957EC5B855264CF6C83 /* SkinsView.swift */,
 			);
 			path = Screens;
@@ -496,6 +499,7 @@
 				A0D718CB1AFD45167687ABC6 /* RoomService.swift in Sources */,
 				BCA3738C9CC26AB2080F9C83 /* SettingsView.swift in Sources */,
 				DF5A58A4936D9F260930FA6D /* SettingsViewModel.swift in Sources */,
+				B6C9906BCAF76048014A7996 /* SinglePlayerSetupView.swift in Sources */,
 				A343BFDEEEA00775CC698863 /* SkinDefinitions.swift in Sources */,
 				6ECDE53056F0F640D020236A /* SkinService.swift in Sources */,
 				900FBFE4C96C6A080333FDA5 /* SkinsView.swift in Sources */,
