@@ -7,11 +7,32 @@ set -e
 
 echo "🔧 Creating Firebase placeholder config for CI builds..."
 
+# Debug: Print environment variables
+echo "CI_WORKSPACE: $CI_WORKSPACE"
+echo "CI_PRIMARY_REPOSITORY_PATH: $CI_PRIMARY_REPOSITORY_PATH"
+echo "PWD: $(pwd)"
+
+# Determine the correct path
+if [ -n "$CI_PRIMARY_REPOSITORY_PATH" ]; then
+    REPO_PATH="$CI_PRIMARY_REPOSITORY_PATH"
+elif [ -n "$CI_WORKSPACE" ]; then
+    REPO_PATH="$CI_WORKSPACE"
+else
+    REPO_PATH="$(pwd)"
+fi
+
+echo "Using repository path: $REPO_PATH"
+
 # Create Resources directory if it doesn't exist
-mkdir -p "$CI_WORKSPACE/HeadshotAirBattle/Resources"
+RESOURCES_DIR="$REPO_PATH/HeadshotAirBattle/Resources"
+echo "Creating directory: $RESOURCES_DIR"
+mkdir -p "$RESOURCES_DIR"
 
 # Create GoogleService-Info.plist placeholder
-cat > "$CI_WORKSPACE/HeadshotAirBattle/Resources/GoogleService-Info.plist" << 'EOF'
+CONFIG_FILE="$RESOURCES_DIR/GoogleService-Info.plist"
+echo "Creating config file: $CONFIG_FILE"
+
+cat > "$CONFIG_FILE" << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -50,9 +71,12 @@ cat > "$CI_WORKSPACE/HeadshotAirBattle/Resources/GoogleService-Info.plist" << 'E
 </plist>
 EOF
 
-echo "✅ Firebase config created successfully"
-
-# List the file to confirm
-ls -la "$CI_WORKSPACE/HeadshotAirBattle/Resources/GoogleService-Info.plist"
+if [ -f "$CONFIG_FILE" ]; then
+    echo "✅ Firebase config created successfully"
+    ls -la "$CONFIG_FILE"
+else
+    echo "❌ Failed to create Firebase config"
+    exit 1
+fi
 
 echo "✅ Post-clone script completed"
