@@ -137,10 +137,7 @@ class BoardManager {
             if let airplane = airplane {
                 if airplane.isCellHit(row: row, col: col) {
                     if airplane.isDestroyed {
-                        let cellType = airplane.getCellType(row: row, col: col)
-                        if cellType == .head {
-                            return .killed
-                        }
+                        return .killed  // 飞机被摧毁后，所有已击中格子都显示 killed
                     }
                     return .hit
                 }

@@ -23,6 +23,8 @@ struct ProfileView: View {
                             .foregroundColor(.white)
 
                         Button("Edit Nickname") {
+                            viewModel.newNickname = appViewModel.nickname  // 预填充当前昵称
+                            viewModel.errorMessage = nil
                             viewModel.showEditNickname = true
                         }
                         .font(.caption)
@@ -45,6 +47,27 @@ struct ProfileView: View {
                         .cornerRadius(12)
                     }
 
+                    // 成功消息
+                    if let success = viewModel.successMessage {
+                        Text(success)
+                            .font(.caption)
+                            .foregroundColor(.green)
+                            .padding()
+                            .background(Color.green.opacity(0.1))
+                            .cornerRadius(8)
+                    }
+
+                    // 错误消息（持久显示，不只在 alert 中）
+                    if let error = viewModel.errorMessage {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                            .background(Color.red.opacity(0.1))
+                            .cornerRadius(8)
+                    }
+
                     Spacer()
                 }
                 .padding()
@@ -54,12 +77,20 @@ struct ProfileView: View {
         .navigationBarTitleDisplayMode(.inline)
         .alert("Edit Nickname", isPresented: $viewModel.showEditNickname) {
             TextField("New nickname", text: $viewModel.newNickname)
+                .textInputAutocapitalization(.never)
             Button("Save") {
                 Task {
-                    try? await appViewModel.updateNickname(viewModel.newNickname)
+                    await viewModel.updateNickname(appViewModel: appViewModel)
                 }
             }
-            Button("Cancel", role: .cancel) {}
+            .disabled(viewModel.isUpdating)
+            Button("Cancel", role: .cancel) {
+                viewModel.errorMessage = nil
+            }
+        } message: {
+            if let error = viewModel.errorMessage {
+                Text(error)
+            }
         }
     }
 }

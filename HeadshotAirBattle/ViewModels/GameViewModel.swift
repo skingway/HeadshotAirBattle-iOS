@@ -27,6 +27,7 @@ class GameViewModel: ObservableObject {
     private var airplaneCount: Int = 3
     private var ai: AIStrategy?
     private var turnTimer: Timer?
+    private var userId: String = ""
 
     var playerAccuracy: Double {
         guard let stats = playerStats else { return 0 }
@@ -36,7 +37,8 @@ class GameViewModel: ObservableObject {
 
     // MARK: - Setup
 
-    func setup(difficulty: String, mode: String, boardSize: Int, airplaneCount: Int) {
+    func setup(difficulty: String, mode: String, boardSize: Int, airplaneCount: Int, userId: String = "") {
+        self.userId = userId
         self.difficulty = GameConstants.AIDifficulty(rawValue: difficulty) ?? .easy
         self.mode = mode
         self.boardSize = boardSize
@@ -231,9 +233,42 @@ class GameViewModel: ObservableObject {
     }
 
     private func saveGameResults() async {
-        let stats = Statistics()
-        // Statistics and achievement saving will be done via StatisticsService and AchievementService
-        // This is handled in Phase 3
+        guard !userId.isEmpty else {
+            print("[GameViewModel] Cannot save: userId is empty")
+            return
+        }
+
+        // 更新统计数据
+        _ = await StatisticsService.shared.updateStatistics(
+            userId: userId,
+            isWinner: didPlayerWin,
+            isOnlineGame: false
+        )
+
+        // 保存游戏历史
+        let historyEntry = GameHistoryEntry(
+            id: UUID().uuidString,
+            userId: userId,
+            gameType: "ai",
+            opponent: "AI (\(difficulty.name))",
+            winner: didPlayerWin ? userId : "AI",
+            boardSize: boardSize,
+            airplaneCount: airplaneCount,
+            totalTurns: totalTurns,
+            completedAt: Date().millisecondsSince1970,
+            players: [userId, "AI"],
+            playerStats: playerStats,
+            aiStats: aiStats,
+            playerBoardData: nil,
+            aiBoardData: nil
+        )
+
+        await StatisticsService.shared.saveGameHistory(
+            userId: userId,
+            gameData: historyEntry
+        )
+
+        print("[GameViewModel] Game results saved for user: \(userId)")
     }
 }
 

@@ -3,6 +3,7 @@ import SwiftUI
 /// Navigation route definitions
 enum AppRoute: Hashable {
     case mainMenu
+    case singlePlayerSetup
     case game(difficulty: String, mode: String, boardSize: Int, airplaneCount: Int)
     case settings
     case profile
@@ -21,6 +22,7 @@ enum AppRoute: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case .mainMenu: hasher.combine("mainMenu")
+        case .singlePlayerSetup: hasher.combine("singlePlayerSetup")
         case .game(let d, let m, let b, let a):
             hasher.combine("game"); hasher.combine(d); hasher.combine(m); hasher.combine(b); hasher.combine(a)
         case .settings: hasher.combine("settings")
@@ -54,6 +56,8 @@ struct ContentView: View {
                     switch route {
                     case .mainMenu:
                         MainMenuView(navigationPath: $navigationPath)
+                    case .singlePlayerSetup:
+                        SinglePlayerSetupView(navigationPath: $navigationPath)
                     case .game(let difficulty, let mode, let boardSize, let airplaneCount):
                         GameView(
                             navigationPath: $navigationPath,

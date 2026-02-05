@@ -51,7 +51,8 @@ struct GameView: View {
                 difficulty: difficulty,
                 mode: mode,
                 boardSize: boardSize,
-                airplaneCount: airplaneCount
+                airplaneCount: airplaneCount,
+                userId: appViewModel.userId
             )
         }
     }
@@ -79,7 +80,8 @@ struct GameView: View {
                         difficulty: difficulty,
                         mode: mode,
                         boardSize: boardSize,
-                        airplaneCount: airplaneCount
+                        airplaneCount: airplaneCount,
+                        userId: appViewModel.userId
                     )
                 }
                 .buttonStyle(.borderedProminent)

@@ -6,6 +6,7 @@ struct OnlineModeView: View {
     @State private var roomCode = ""
     @State private var showJoinRoom = false
     @State private var isCreatingRoom = false
+    @State private var isJoiningRoom = false
     @State private var errorMessage: String?
 
     var body: some View {
@@ -16,6 +17,16 @@ struct OnlineModeView: View {
                 Text("Online Mode")
                     .font(.title.bold())
                     .foregroundColor(.white)
+
+                // Offline mode warning
+                if appViewModel.isOfflineMode {
+                    Text("Online features require internet connection")
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                        .padding()
+                        .background(Color.orange.opacity(0.1))
+                        .cornerRadius(8)
+                }
 
                 Spacer()
 
@@ -29,6 +40,10 @@ struct OnlineModeView: View {
                     MenuButton(title: "Create Room", icon: "plus.circle.fill") {
                         Task { await createRoom() }
                     }
+                    .disabled(isCreatingRoom || appViewModel.isOfflineMode)
+                    .overlay(
+                        isCreatingRoom ? ProgressView().tint(.white) : nil
+                    )
 
                     // Join Room
                     MenuButton(title: "Join Room", icon: "arrow.right.circle.fill") {
@@ -58,27 +73,46 @@ struct OnlineModeView: View {
     }
 
     private func createRoom() async {
+        guard !isCreatingRoom else { return }
+
+        if appViewModel.isOfflineMode {
+            errorMessage = "Cannot create room in offline mode"
+            return
+        }
+
         isCreatingRoom = true
+        errorMessage = nil
         defer { isCreatingRoom = false }
 
         do {
-            let roomService = RoomService.shared
-            let (gameId, code) = try await roomService.createRoom(
+            let (gameId, code) = try await RoomService.shared.createRoom(
                 hostId: appViewModel.userId,
                 hostNickname: appViewModel.nickname
             )
-            navigationPath.append(AppRoute.roomLobby(gameId: gameId, roomCode: code))
+
+            await MainActor.run {
+                navigationPath.append(AppRoute.roomLobby(gameId: gameId, roomCode: code))
+            }
         } catch {
-            errorMessage = "Failed to create room: \(error.localizedDescription)"
+            print("[OnlineModeView] Create room error: \(error)")
+            await MainActor.run {
+                errorMessage = "Failed to create room: \(error.localizedDescription)"
+            }
         }
     }
 
     private func joinRoom() async {
+        guard !isJoiningRoom else { return }
+
         let code = roomCode.uppercased().trimmingCharacters(in: .whitespacesAndNewlines)
         guard RoomService.shared.isValidRoomCode(code) else {
-            errorMessage = "Invalid room code format"
+            errorMessage = "Invalid room code format (must be 6 characters)"
             return
         }
+
+        isJoiningRoom = true
+        errorMessage = nil
+        defer { isJoiningRoom = false }
 
         do {
             let gameId = try await RoomService.shared.joinRoom(
@@ -86,9 +120,15 @@ struct OnlineModeView: View {
                 userId: appViewModel.userId,
                 nickname: appViewModel.nickname
             )
-            navigationPath.append(AppRoute.onlineGame(gameId: gameId))
+
+            await MainActor.run {
+                navigationPath.append(AppRoute.onlineGame(gameId: gameId))
+            }
         } catch {
-            errorMessage = "Failed to join room: \(error.localizedDescription)"
+            print("[OnlineModeView] Join room error: \(error)")
+            await MainActor.run {
+                errorMessage = "Failed to join room: \(error.localizedDescription)"
+            }
         }
     }
 }

@@ -26,9 +26,7 @@ struct MainMenuView: View {
                 // Menu buttons
                 VStack(spacing: 16) {
                     MenuButton(title: "Single Player", icon: "airplane") {
-                        navigationPath.append(
-                            AppRoute.game(difficulty: "easy", mode: "standard", boardSize: 10, airplaneCount: 3)
-                        )
+                        navigationPath.append(AppRoute.singlePlayerSetup)
                     }
 
                     MenuButton(title: "Online PvP", icon: "wifi") {
