@@ -1,14 +1,14 @@
 import SwiftUI
 
-/// Board view for airplane deployment phase - drag airplane to board to place
+/// Board view for airplane deployment phase - drag from airplane icon to board
 struct DeploymentBoardView: View {
     @ObservedObject var viewModel: GameViewModel
     @State private var selectedDirection: GameConstants.Direction = .up
     @State private var isDragging = false
-    @State private var dragHeadRow: Int? = nil  // 拖拽时机头所在的行
-    @State private var dragHeadCol: Int? = nil  // 拖拽时机头所在的列
+    @State private var dragHeadRow: Int = -1
+    @State private var dragHeadCol: Int = -1
     @State private var showPlacementError = false
-    @State private var boardOrigin: CGPoint = .zero
+    @State private var gridOriginInGlobal: CGPoint = .zero
     private let themeColors = SkinDefinitions.currentThemeColors()
 
     private var cellSize: CGFloat {
@@ -19,11 +19,9 @@ struct DeploymentBoardView: View {
         return min(max(size, GameConstants.GridDisplay.minCellSize), GameConstants.GridDisplay.maxCellSize)
     }
 
-    // 计算拖拽预览的飞机格子
-    private var dragPreviewCells: [AirplaneCell] {
-        guard let row = dragHeadRow, let col = dragHeadCol else { return [] }
-        return Airplane.calculateCells(headRow: row, headCol: col, direction: selectedDirection)
-    }
+    // 标签偏移量
+    private let labelOffsetX: CGFloat = 24
+    private let labelOffsetY: CGFloat = 16
 
     var body: some View {
         VStack(spacing: 12) {
@@ -35,58 +33,56 @@ struct DeploymentBoardView: View {
                 .font(.caption)
                 .foregroundColor(.gray)
 
-            // Board with drag preview overlay
+            // Board
             if let board = viewModel.playerBoard {
-                ZStack {
+                ZStack(alignment: .topLeading) {
+                    // 棋盘网格
                     boardGrid(board: board)
                         .background(
                             GeometryReader { geo in
-                                Color.clear
-                                    .onAppear { boardOrigin = geo.frame(in: .global).origin }
-                                    .onChange(of: geo.frame(in: .global)) { boardOrigin = $0.origin }
+                                Color.clear.preference(
+                                    key: GridOriginPreferenceKey.self,
+                                    value: geo.frame(in: .global).origin
+                                )
                             }
                         )
+                        .onPreferenceChange(GridOriginPreferenceKey.self) { origin in
+                            gridOriginInGlobal = origin
+                        }
 
-                    // 拖拽预览 - 直接显示在棋盘格子上
-                    if isDragging && dragHeadRow != nil {
+                    // 拖拽预览叠加层
+                    if isDragging && dragHeadRow >= 0 && dragHeadCol >= 0 {
                         dragPreviewOverlay(board: board)
                     }
                 }
-                .gesture(
-                    DragGesture(coordinateSpace: .global)
-                        .onChanged { value in
-                            isDragging = true
-                            updateDragPosition(globalLocation: value.location, board: board)
-                        }
-                        .onEnded { value in
-                            handleDrop()
-                            isDragging = false
-                            dragHeadRow = nil
-                            dragHeadCol = nil
-                        }
-                )
             }
 
             if showPlacementError {
                 Text("Cannot place airplane here")
                     .font(.caption)
                     .foregroundColor(.red)
-                    .transition(.opacity)
             }
 
-            // Airplane icon and controls
+            // 飞机图标和控制按钮
             HStack(spacing: 20) {
-                // 飞机图标（用于开始拖拽）
-                VStack {
-                    AirplaneIconView(direction: selectedDirection, size: 80)
-                        .opacity(isDragging ? 0.3 : 1.0)
-                    Text("Drag to board")
-                        .font(.caption2)
-                        .foregroundColor(.gray)
-                }
+                // 可拖拽的飞机图标
+                AirplaneIconView(direction: selectedDirection, size: 80)
+                    .opacity(isDragging ? 0.3 : 1.0)
+                    .gesture(
+                        DragGesture(coordinateSpace: .global)
+                            .onChanged { value in
+                                isDragging = true
+                                updateDragPosition(globalLocation: value.location)
+                            }
+                            .onEnded { _ in
+                                placeDraggedAirplane()
+                                isDragging = false
+                                dragHeadRow = -1
+                                dragHeadCol = -1
+                            }
+                    )
 
                 VStack(spacing: 12) {
-                    // Rotate button
                     Button(action: rotateDirection) {
                         Label("Rotate", systemImage: "arrow.triangle.2.circlepath")
                     }
@@ -108,7 +104,7 @@ struct DeploymentBoardView: View {
             }
             .padding(.top, 8)
 
-            // Confirm button
+            // 开始战斗按钮
             if viewModel.isDeploymentComplete() {
                 Button("Start Battle") {
                     viewModel.confirmDeployment()
@@ -118,180 +114,184 @@ struct DeploymentBoardView: View {
                 .tint(.green)
                 .padding(.top, 8)
             }
+
+            Text("Drag airplane to board or tap cell to place")
+                .font(.caption2)
+                .foregroundColor(.gray)
         }
         .padding()
     }
 
-    // 拖拽预览叠加层 - 显示飞机将要放置的位置
+    // 拖拽预览叠加层
     @ViewBuilder
     private func dragPreviewOverlay(board: BoardManager) -> some View {
-        let cells = dragPreviewCells
-        let isValidPlacement = checkPlacementValid(board: board, cells: cells)
+        let cells = Airplane.calculateCells(headRow: dragHeadRow, headCol: dragHeadCol, direction: selectedDirection)
+        let isValid = isPlacementValid(board: board, cells: cells)
 
-        ForEach(cells, id: \.row) { cell in
+        // 使用 Canvas 或简单的 ForEach
+        ForEach(Array(cells.enumerated()), id: \.offset) { _, cell in
             if cell.row >= 0 && cell.row < board.size && cell.col >= 0 && cell.col < board.size {
                 Rectangle()
-                    .fill(isValidPlacement ? Color.green.opacity(0.5) : Color.red.opacity(0.5))
-                    .frame(width: cellSize, height: cellSize)
+                    .fill(isValid ? Color.green.opacity(0.6) : Color.red.opacity(0.6))
+                    .frame(width: cellSize - 2, height: cellSize - 2)
                     .overlay(
                         Group {
                             if cell.type == .head {
                                 Circle()
                                     .stroke(Color.white, lineWidth: 2)
-                                    .frame(width: cellSize * 0.6, height: cellSize * 0.6)
                             }
                         }
                     )
-                    .position(cellPosition(row: cell.row, col: cell.col, board: board))
+                    .position(
+                        x: labelOffsetX + CGFloat(cell.col) * cellSize + cellSize / 2,
+                        y: labelOffsetY + CGFloat(cell.row) * cellSize + cellSize / 2
+                    )
             }
         }
     }
 
-    // 计算格子在棋盘上的位置
-    private func cellPosition(row: Int, col: Int, board: BoardManager) -> CGPoint {
-        let gridOriginX: CGFloat = 24  // 行标签宽度
-        let gridOriginY: CGFloat = 16  // 列标签高度
-
-        return CGPoint(
-            x: gridOriginX + CGFloat(col) * cellSize + cellSize / 2,
-            y: gridOriginY + CGFloat(row) * cellSize + cellSize / 2
-        )
-    }
-
-    // 检查放置是否有效
-    private func checkPlacementValid(board: BoardManager, cells: [AirplaneCell]) -> Bool {
-        // 检查边界
-        for cell in cells {
-            if cell.row < 0 || cell.row >= board.size || cell.col < 0 || cell.col >= board.size {
-                return false
-            }
-        }
-
-        // 检查重叠
-        for cell in cells {
-            if board.hasAirplaneAt(row: cell.row, col: cell.col) {
-                return false
-            }
-        }
-
-        // 检查数量
+    private func isPlacementValid(board: BoardManager, cells: [AirplaneCell]) -> Bool {
+        // 检查数量限制
         if board.airplanes.count >= board.airplaneCount {
             return false
         }
 
+        for cell in cells {
+            // 检查边界
+            if cell.row < 0 || cell.row >= board.size || cell.col < 0 || cell.col >= board.size {
+                return false
+            }
+            // 检查重叠
+            if board.hasAirplaneAt(row: cell.row, col: cell.col) {
+                return false
+            }
+        }
         return true
     }
 
     @ViewBuilder
     private func boardGrid(board: BoardManager) -> some View {
         VStack(spacing: 0) {
-            // Column labels
+            // 列标签
             HStack(spacing: 0) {
-                Text("")
-                    .frame(width: 24, height: 16)
+                Color.clear.frame(width: labelOffsetX, height: labelOffsetY)
                 ForEach(0..<board.size, id: \.self) { col in
                     Text(CoordinateSystem.indexToLetter(col))
                         .font(.system(size: min(cellSize * 0.4, 10)))
                         .foregroundColor(.gray)
-                        .frame(width: cellSize, height: 16)
+                        .frame(width: cellSize, height: labelOffsetY)
                 }
             }
 
+            // 行
             ForEach(0..<board.size, id: \.self) { row in
                 HStack(spacing: 0) {
+                    // 行标签
                     Text("\(row + 1)")
                         .font(.system(size: min(cellSize * 0.4, 10)))
                         .foregroundColor(.gray)
-                        .frame(width: 24)
+                        .frame(width: labelOffsetX, height: cellSize)
 
+                    // 格子
                     ForEach(0..<board.size, id: \.self) { col in
-                        let airplane = board.getAirplaneAt(row: row, col: col)
-
-                        DeployedAirplaneCellView(
-                            airplane: airplane,
-                            row: row,
-                            col: col,
-                            cellSize: cellSize,
-                            themeColors: themeColors
-                        )
-                        .overlay(
-                            Rectangle()
-                                .stroke(Color(hex: themeColors.gridLine), lineWidth: 0.5)
-                        )
-                        .onTapGesture {
-                            handleCellTap(row: row, col: col)
-                        }
+                        cellView(board: board, row: row, col: col)
                     }
                 }
             }
         }
     }
 
-    private func updateDragPosition(globalLocation: CGPoint, board: BoardManager) {
-        // 计算相对于棋盘的位置
-        let relativeX = globalLocation.x - boardOrigin.x
-        let relativeY = globalLocation.y - boardOrigin.y
+    @ViewBuilder
+    private func cellView(board: BoardManager, row: Int, col: Int) -> some View {
+        let airplane = board.getAirplaneAt(row: row, col: col)
 
-        let gridOriginX: CGFloat = 24
-        let gridOriginY: CGFloat = 16
-
-        // 转换为格子坐标
-        let col = Int((relativeX - gridOriginX) / cellSize)
-        let row = Int((relativeY - gridOriginY) / cellSize)
-
-        // 更新拖拽位置（即使超出边界也更新，让用户看到预览）
-        dragHeadRow = row
-        dragHeadCol = col
+        ZStack {
+            if let airplane = airplane,
+               let cellType = airplane.getCellType(row: row, col: col) {
+                AirplaneCellView(type: cellType, cellSize: cellSize, showDetailed: true)
+                    .overlay(
+                        Group {
+                            if cellType == .head {
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 2)
+                                    .frame(width: cellSize * 0.6, height: cellSize * 0.6)
+                            }
+                        }
+                    )
+            } else {
+                Rectangle()
+                    .fill(Color(hex: themeColors.cellEmpty))
+            }
+        }
+        .frame(width: cellSize, height: cellSize)
+        .overlay(
+            Rectangle()
+                .stroke(Color(hex: themeColors.gridLine), lineWidth: 0.5)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            handleCellTap(board: board, row: row, col: col)
+        }
     }
 
-    private func handleDrop() {
-        guard let board = viewModel.playerBoard,
-              let row = dragHeadRow,
-              let col = dragHeadCol else { return }
+    private func updateDragPosition(globalLocation: CGPoint) {
+        // 计算相对于棋盘格子区域的位置
+        let relativeX = globalLocation.x - gridOriginInGlobal.x - labelOffsetX
+        let relativeY = globalLocation.y - gridOriginInGlobal.y - labelOffsetY
+
+        // 转换为格子坐标
+        let col = Int(relativeX / cellSize)
+        let row = Int(relativeY / cellSize)
+
+        dragHeadRow = row
+        dragHeadCol = col
+
+        print("[Drag] global: \(globalLocation), gridOrigin: \(gridOriginInGlobal), row: \(row), col: \(col)")
+    }
+
+    private func placeDraggedAirplane() {
+        guard let board = viewModel.playerBoard else { return }
+
+        let row = dragHeadRow
+        let col = dragHeadCol
 
         // 边界检查
         guard row >= 0 && row < board.size && col >= 0 && col < board.size else {
-            showError()
             return
         }
 
-        // 检查是否已有飞机，有则移除
-        if let airplane = board.getAirplaneAt(row: row, col: col) {
-            viewModel.removeAirplane(id: airplane.id)
-            return
-        }
-
-        // 尝试放置飞机
+        // 尝试放置
         let success = viewModel.addAirplane(headRow: row, headCol: col, direction: selectedDirection)
 
         if !success {
-            showError()
-        }
-    }
-
-    private func handleCellTap(row: Int, col: Int) {
-        guard let board = viewModel.playerBoard else { return }
-
-        // If there's an airplane here, remove it
-        if let airplane = board.getAirplaneAt(row: row, col: col) {
-            viewModel.removeAirplane(id: airplane.id)
-            return
-        }
-
-        // Try to place an airplane
-        let success = viewModel.addAirplane(headRow: row, headCol: col, direction: selectedDirection)
-        if !success {
-            showError()
-        }
-    }
-
-    private func showError() {
-        withAnimation {
-            showPlacementError = true
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             withAnimation {
-                showPlacementError = false
+                showPlacementError = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation {
+                    showPlacementError = false
+                }
+            }
+        }
+    }
+
+    private func handleCellTap(board: BoardManager, row: Int, col: Int) {
+        // 如果有飞机则删除
+        if let airplane = board.getAirplaneAt(row: row, col: col) {
+            viewModel.removeAirplane(id: airplane.id)
+            return
+        }
+
+        // 否则尝试放置
+        let success = viewModel.addAirplane(headRow: row, headCol: col, direction: selectedDirection)
+        if !success {
+            withAnimation {
+                showPlacementError = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation {
+                    showPlacementError = false
+                }
             }
         }
     }
@@ -301,5 +301,13 @@ struct DeploymentBoardView: View {
         if let index = allDirs.firstIndex(of: selectedDirection) {
             selectedDirection = allDirs[(index + 1) % allDirs.count]
         }
+    }
+}
+
+// PreferenceKey 用于获取棋盘的全局位置
+struct GridOriginPreferenceKey: PreferenceKey {
+    static var defaultValue: CGPoint = .zero
+    static func reduce(value: inout CGPoint, nextValue: () -> CGPoint) {
+        value = nextValue()
     }
 }
