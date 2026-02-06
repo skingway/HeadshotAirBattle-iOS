@@ -115,18 +115,20 @@ class Airplane: Identifiable {
 
         let cellKey = "\(row),\(col)"
 
-        // Already hit
+        // Already hit this specific cell
         if hits.contains(cellKey) {
             return (.alreadyAttacked, hitCell.type == .head, hitCell.type)
         }
 
-        // If already destroyed, treat as miss
-        if isDestroyed {
-            return (.miss, false, nil)
-        }
-
         // Record hit
         hits.insert(cellKey)
+
+        // If airplane is already destroyed (e.g., head was hit earlier),
+        // hitting other cells should still show as hit, not miss
+        if isDestroyed {
+            // This cell belongs to a destroyed airplane, show it as hit
+            return (.hit, hitCell.type == .head, hitCell.type)
+        }
 
         // Head shot = instant kill
         if hitCell.type == .head {

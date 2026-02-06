@@ -5,7 +5,8 @@ struct DeploymentBoardView: View {
     @ObservedObject var viewModel: GameViewModel
     @State private var selectedDirection: GameConstants.Direction = .up
     @State private var isDragging = false
-    @State private var draggedPosition: CGPoint = .zero
+    @State private var dragPosition: CGPoint = .zero
+    @State private var boardFrame: CGRect = .zero
     private let themeColors = SkinDefinitions.currentThemeColors()
 
     private var cellSize: CGFloat {
@@ -17,73 +18,83 @@ struct DeploymentBoardView: View {
     }
 
     var body: some View {
-        ZStack {
-            VStack(spacing: 12) {
-                Text("Deploy Your Fleet")
-                    .font(.title2.bold())
-                    .foregroundColor(.white)
+        GeometryReader { geometry in
+            ZStack {
+                VStack(spacing: 12) {
+                    Text("Deploy Your Fleet")
+                        .font(.title2.bold())
+                        .foregroundColor(.white)
 
-                Text("\(viewModel.deployedAirplanes.count)/\(viewModel.playerBoard?.airplaneCount ?? 3) airplanes placed")
-                    .font(.caption)
-                    .foregroundColor(.gray)
+                    Text("\(viewModel.deployedAirplanes.count)/\(viewModel.playerBoard?.airplaneCount ?? 3) airplanes placed")
+                        .font(.caption)
+                        .foregroundColor(.gray)
 
-                // Board
-                if let board = viewModel.playerBoard {
-                    boardGrid(board: board)
-                }
-
-            // Airplane preview
-            AirplaneShapeView(direction: selectedDirection, cellSize: 20)
-                .frame(height: 100)
-                .gesture(
-                    DragGesture()
-                        .onChanged { value in
-                            isDragging = true
-                            draggedPosition = value.location
-                        }
-                        .onEnded { value in
-                            handleDrop(at: value.location)
-                            isDragging = false
-                        }
-                )
-
-            // Controls
-            HStack(spacing: 16) {
-                Button(action: rotateDirection) {
-                    Label("Rotate", systemImage: "arrow.triangle.2.circlepath")
-                }
-                .buttonStyle(.bordered)
-
-                Button(action: { viewModel.deployAirplanesRandomly() }) {
-                    Label("Random", systemImage: "dice.fill")
-                }
-                .buttonStyle(.bordered)
-
-                Button(action: { viewModel.clearDeployment() }) {
-                    Label("Clear", systemImage: "trash")
-                }
-                .buttonStyle(.bordered)
-                .tint(.red)
-            }
-
-                // Confirm button
-                if viewModel.isDeploymentComplete() {
-                    Button("Start Battle") {
-                        viewModel.confirmDeployment()
+                    // Board
+                    if let board = viewModel.playerBoard {
+                        boardGrid(board: board)
+                            .background(
+                                GeometryReader { boardGeometry in
+                                    Color.clear.onAppear {
+                                        boardFrame = boardGeometry.frame(in: .global)
+                                    }
+                                }
+                            )
                     }
-                    .font(.headline)
-                    .buttonStyle(.borderedProminent)
-                    .tint(.green)
-                }
-            }
-            .padding()
 
-            // Drag preview overlay
-            if isDragging {
-                AirplaneShapeView(direction: selectedDirection, cellSize: cellSize)
-                    .opacity(0.6)
-                    .position(draggedPosition)
-                    .allowsHitTesting(false)
+                    // Airplane preview - draggable
+                    AirplaneShapeView(direction: selectedDirection, cellSize: 20)
+                        .frame(height: 100)
+                        .gesture(
+                            DragGesture(coordinateSpace: .global)
+                                .onChanged { value in
+                                    isDragging = true
+                                    dragPosition = value.location
+                                }
+                                .onEnded { value in
+                                    handleDrop(at: value.location)
+                                    isDragging = false
+                                }
+                        )
+
+                    // Controls
+                    HStack(spacing: 16) {
+                        Button(action: rotateDirection) {
+                            Label("Rotate", systemImage: "arrow.triangle.2.circlepath")
+                        }
+                        .buttonStyle(.bordered)
+
+                        Button(action: { viewModel.deployAirplanesRandomly() }) {
+                            Label("Random", systemImage: "dice.fill")
+                        }
+                        .buttonStyle(.bordered)
+
+                        Button(action: { viewModel.clearDeployment() }) {
+                            Label("Clear", systemImage: "trash")
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.red)
+                    }
+
+                    // Confirm button
+                    if viewModel.isDeploymentComplete() {
+                        Button("Start Battle") {
+                            viewModel.confirmDeployment()
+                        }
+                        .font(.headline)
+                        .buttonStyle(.borderedProminent)
+                        .tint(.green)
+                    }
+                }
+                .padding()
+
+                // Drag preview overlay - follows finger exactly
+                if isDragging {
+                    AirplaneShapeView(direction: selectedDirection, cellSize: cellSize)
+                        .opacity(0.7)
+                        .position(x: dragPosition.x - geometry.frame(in: .global).minX,
+                                  y: dragPosition.y - geometry.frame(in: .global).minY)
+                        .allowsHitTesting(false)
+                }
             }
         }
     }
@@ -156,16 +167,20 @@ struct DeploymentBoardView: View {
         _ = viewModel.addAirplane(headRow: row, headCol: col, direction: selectedDirection)
     }
 
-    private func handleDrop(at location: CGPoint) {
+    private func handleDrop(at globalLocation: CGPoint) {
         guard let board = viewModel.playerBoard else { return }
 
-        // 计算棋盘的起始位置（考虑坐标轴标签的宽度）
+        // 计算相对于棋盘的位置
+        let relativeX = globalLocation.x - boardFrame.minX
+        let relativeY = globalLocation.y - boardFrame.minY
+
+        // 考虑坐标轴标签的宽度
         let gridOriginX: CGFloat = 24  // 行标签宽度
         let gridOriginY: CGFloat = 16  // 列标签高度
 
         // 转换为棋盘坐标
-        let col = Int((location.x - gridOriginX) / cellSize)
-        let row = Int((location.y - gridOriginY) / cellSize)
+        let col = Int((relativeX - gridOriginX) / cellSize)
+        let row = Int((relativeY - gridOriginY) / cellSize)
 
         // 边界检查
         guard row >= 0 && row < board.size && col >= 0 && col < board.size else {

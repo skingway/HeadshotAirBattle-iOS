@@ -3,42 +3,74 @@ import SwiftUI
 struct BattleReportView: View {
     @Binding var navigationPath: NavigationPath
     let gameData: GameHistoryEntry
+    private let themeColors = SkinDefinitions.currentThemeColors()
+
+    private var cellSize: CGFloat {
+        let screenWidth = UIScreen.main.bounds.width
+        let availableWidth = (screenWidth - 80) / 2  // 两个棋盘并排
+        return min(max(availableWidth / CGFloat(gameData.boardSize), 12), 20)
+    }
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
 
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 20) {
                     // Result
-                    Text(gameData.winner == gameData.userId ? "VICTORY" : "DEFEAT")
-                        .font(.system(size: 32, weight: .black))
-                        .foregroundColor(gameData.winner == gameData.userId ? .green : .red)
+                    HStack {
+                        Image(systemName: gameData.winner == gameData.userId ? "trophy.fill" : "xmark.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(gameData.winner == gameData.userId ? .yellow : .red)
+                        Text(gameData.winner == gameData.userId ? "VICTORY" : "DEFEAT")
+                            .font(.system(size: 28, weight: .black))
+                            .foregroundColor(gameData.winner == gameData.userId ? .green : .red)
+                    }
 
                     // Game info
-                    VStack(spacing: 12) {
-                        InfoRow(label: "Mode", value: "\(gameData.boardSize)x\(gameData.boardSize)")
-                        InfoRow(label: "Airplanes", value: "\(gameData.airplaneCount)")
-                        InfoRow(label: "Total Turns", value: "\(gameData.totalTurns)")
-                        InfoRow(label: "Opponent", value: gameData.opponent)
-                        InfoRow(label: "Type", value: gameData.gameType == "ai" ? "vs AI" : "Online")
+                    HStack(spacing: 16) {
+                        InfoBadge(icon: "square.grid.3x3", value: "\(gameData.boardSize)×\(gameData.boardSize)")
+                        InfoBadge(icon: "airplane", value: "\(gameData.airplaneCount)")
+                        InfoBadge(icon: "arrow.triangle.2.circlepath", value: "\(gameData.totalTurns)")
                     }
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
 
-                    // Player stats
-                    if let stats = gameData.playerStats {
+                    // Battle Boards - 双方棋盘对比
+                    if gameData.playerBoardData != nil || gameData.aiBoardData != nil {
                         VStack(spacing: 12) {
-                            Text("Your Stats")
+                            Text("Battle Map")
                                 .font(.headline)
-                                .foregroundColor(.cyan)
-                            InfoRow(label: "Hits", value: "\(stats.hits)")
-                            InfoRow(label: "Misses", value: "\(stats.misses)")
-                            InfoRow(label: "Kills", value: "\(stats.kills)")
-                            let total = stats.hits + stats.misses
-                            if total > 0 {
-                                InfoRow(label: "Accuracy", value: String(format: "%.1f%%", Double(stats.hits) / Double(total) * 100))
+                                .foregroundColor(.white)
+
+                            HStack(alignment: .top, spacing: 16) {
+                                // 玩家棋盘（被攻击情况）
+                                VStack(spacing: 4) {
+                                    Text("Your Fleet")
+                                        .font(.caption.bold())
+                                        .foregroundColor(.green)
+                                    if let boardData = gameData.playerBoardData {
+                                        ReportBoardView(
+                                            boardData: boardData,
+                                            cellSize: cellSize,
+                                            themeColors: themeColors,
+                                            isPlayerBoard: true
+                                        )
+                                    }
+                                }
+
+                                // 对手棋盘（你的攻击情况）
+                                VStack(spacing: 4) {
+                                    Text("Enemy Fleet")
+                                        .font(.caption.bold())
+                                        .foregroundColor(.cyan)
+                                    if let boardData = gameData.aiBoardData {
+                                        ReportBoardView(
+                                            boardData: boardData,
+                                            cellSize: cellSize,
+                                            themeColors: themeColors,
+                                            isPlayerBoard: false
+                                        )
+                                    }
+                                }
                             }
                         }
                         .padding()
@@ -46,26 +78,166 @@ struct BattleReportView: View {
                         .cornerRadius(12)
                     }
 
-                    // AI stats
-                    if let aiStats = gameData.aiStats {
-                        VStack(spacing: 12) {
-                            Text("Opponent Stats")
-                                .font(.headline)
-                                .foregroundColor(.orange)
-                            InfoRow(label: "Hits", value: "\(aiStats.hits)")
-                            InfoRow(label: "Misses", value: "\(aiStats.misses)")
-                            InfoRow(label: "Kills", value: "\(aiStats.kills)")
+                    // Stats comparison
+                    HStack(alignment: .top, spacing: 16) {
+                        // Player stats
+                        if let stats = gameData.playerStats {
+                            VStack(spacing: 8) {
+                                Text("Your Stats")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.cyan)
+                                StatItem(icon: "flame.fill", label: "Hits", value: "\(stats.hits)", color: .orange)
+                                StatItem(icon: "circle", label: "Misses", value: "\(stats.misses)", color: .gray)
+                                StatItem(icon: "xmark.circle.fill", label: "Kills", value: "\(stats.kills)", color: .red)
+                                let total = stats.hits + stats.misses
+                                if total > 0 {
+                                    StatItem(icon: "target", label: "Accuracy",
+                                            value: String(format: "%.0f%%", Double(stats.hits) / Double(total) * 100),
+                                            color: .green)
+                                }
+                            }
+                            .padding()
+                            .background(Color.cyan.opacity(0.1))
+                            .cornerRadius(8)
                         }
-                        .padding()
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(12)
+
+                        // AI stats
+                        if let aiStats = gameData.aiStats {
+                            VStack(spacing: 8) {
+                                Text("Opponent Stats")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.orange)
+                                StatItem(icon: "flame.fill", label: "Hits", value: "\(aiStats.hits)", color: .orange)
+                                StatItem(icon: "circle", label: "Misses", value: "\(aiStats.misses)", color: .gray)
+                                StatItem(icon: "xmark.circle.fill", label: "Kills", value: "\(aiStats.kills)", color: .red)
+                            }
+                            .padding()
+                            .background(Color.orange.opacity(0.1))
+                            .cornerRadius(8)
+                        }
                     }
+
+                    // Match details
+                    VStack(spacing: 8) {
+                        InfoRow(label: "Opponent", value: gameData.opponent)
+                        InfoRow(label: "Type", value: gameData.gameType == "ai" ? "vs AI" : "Online")
+                        InfoRow(label: "Date", value: formatDate(gameData.completedAt))
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(12)
                 }
                 .padding()
             }
         }
         .navigationTitle("Battle Report")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func formatDate(_ timestamp: Double) -> String {
+        let date = Date(timeIntervalSince1970: timestamp / 1000)
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+}
+
+// 战报棋盘视图 - 显示飞机位置和攻击点
+struct ReportBoardView: View {
+    let boardData: BoardData
+    let cellSize: CGFloat
+    let themeColors: ThemeColors
+    let isPlayerBoard: Bool
+
+    var body: some View {
+        let airplanes = boardData.airplanes.map { Airplane.fromData($0) }
+        let attackedCells = Set(boardData.attackedCells)
+
+        VStack(spacing: 0) {
+            ForEach(0..<boardData.size, id: \.self) { row in
+                HStack(spacing: 0) {
+                    ForEach(0..<boardData.size, id: \.self) { col in
+                        let cellKey = "\(row),\(col)"
+                        let isAttacked = attackedCells.contains(cellKey)
+                        let airplane = airplanes.first { $0.hasCell(row: row, col: col) }
+                        let cellType = airplane?.getCellType(row: row, col: col)
+                        let isHit = isAttacked && airplane != nil
+
+                        ReportCellView(
+                            hasAirplane: airplane != nil,
+                            cellType: cellType,
+                            isAttacked: isAttacked,
+                            isHit: isHit,
+                            isDestroyed: airplane?.isDestroyed ?? false,
+                            cellSize: cellSize,
+                            themeColors: themeColors
+                        )
+                    }
+                }
+            }
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: 4)
+                .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+        )
+    }
+}
+
+// 战报单元格视图
+struct ReportCellView: View {
+    let hasAirplane: Bool
+    let cellType: AirplaneCellType?
+    let isAttacked: Bool
+    let isHit: Bool
+    let isDestroyed: Bool
+    let cellSize: CGFloat
+    let themeColors: ThemeColors
+
+    var body: some View {
+        ZStack {
+            // 背景色
+            Rectangle()
+                .fill(backgroundColor)
+                .frame(width: cellSize, height: cellSize)
+
+            // 攻击标记
+            if isAttacked {
+                if isHit {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: cellSize * 0.5))
+                        .foregroundColor(.orange)
+                } else {
+                    Circle()
+                        .fill(Color.white.opacity(0.5))
+                        .frame(width: cellSize * 0.3, height: cellSize * 0.3)
+                }
+            }
+
+            // 机头标记
+            if cellType == .head && hasAirplane {
+                Circle()
+                    .stroke(Color.white, lineWidth: 1)
+                    .frame(width: cellSize * 0.6, height: cellSize * 0.6)
+            }
+        }
+        .overlay(
+            Rectangle()
+                .stroke(Color.gray.opacity(0.3), lineWidth: 0.5)
+        )
+    }
+
+    private var backgroundColor: Color {
+        if isDestroyed && hasAirplane {
+            return Color(hex: themeColors.cellKilled)
+        } else if isHit {
+            return Color(hex: themeColors.cellHit)
+        } else if isAttacked && !hasAirplane {
+            return Color(hex: themeColors.cellMiss)
+        } else if hasAirplane {
+            return Color(hex: SkinDefinitions.currentSkinColor()).opacity(0.7)
+        }
+        return Color(hex: themeColors.cellEmpty)
     }
 }
 
@@ -81,6 +253,47 @@ struct InfoRow: View {
             Text(value)
                 .foregroundColor(.white)
                 .fontWeight(.medium)
+        }
+    }
+}
+
+struct InfoBadge: View {
+    let icon: String
+    let value: String
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.caption)
+            Text(value)
+                .font(.caption.bold())
+        }
+        .foregroundColor(.white)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color.gray.opacity(0.3))
+        .cornerRadius(8)
+    }
+}
+
+struct StatItem: View {
+    let icon: String
+    let label: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+                .foregroundColor(color)
+                .frame(width: 20)
+            Text(label)
+                .foregroundColor(.gray)
+                .font(.caption)
+            Spacer()
+            Text(value)
+                .foregroundColor(.white)
+                .font(.caption.bold())
         }
     }
 }

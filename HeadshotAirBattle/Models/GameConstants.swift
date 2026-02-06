@@ -207,7 +207,8 @@ enum GameConstants {
         static let minNicknameLength = 1
         static let maxNicknameLength = 20
         static let nicknameChangeCooldown: TimeInterval = 30 * 24 * 60 * 60 // 30 days
-        static let nicknamePattern = "^[a-zA-Z0-9_\\u{4e00}-\\u{9fa5}]+$"
+        // 允许字母、数字、下划线和中文字符
+        static let nicknamePattern = "^[a-zA-Z0-9_\u{4e00}-\u{9fa5}]+$"
     }
 
     // MARK: - Storage Keys (UserDefaults)

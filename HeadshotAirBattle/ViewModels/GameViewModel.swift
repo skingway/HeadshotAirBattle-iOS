@@ -169,6 +169,9 @@ class GameViewModel: ObservableObject {
         // Play sound
         AudioService.shared.playSFX(for: result.result)
 
+        // 强制触发界面刷新 - playerBoard 内部状态变化后需要通知 SwiftUI
+        objectWillChange.send()
+
         // Check loss
         if playerBoard.areAllAirplanesDestroyed() {
             endGame(playerWon: false)
@@ -239,13 +242,29 @@ class GameViewModel: ObservableObject {
         }
 
         // 更新统计数据
-        _ = await StatisticsService.shared.updateStatistics(
+        let updatedStats = await StatisticsService.shared.updateStatistics(
             userId: userId,
             isWinner: didPlayerWin,
             isOnlineGame: false
         )
 
-        // 保存游戏历史
+        // 检查成就解锁
+        let gameResult = GameResult(
+            winner: didPlayerWin ? userId : "AI",
+            totalTurns: totalTurns,
+            playerStats: playerStats ?? GameStats(),
+            aiStats: aiStats,
+            comebackWin: checkComebackWin(),
+            first5AllHit: checkFirst5AllHit(),
+            boardSize: boardSize,
+            airplaneCount: airplaneCount,
+            gameType: .ai,
+            opponent: "AI (\(difficulty.name))"
+        )
+        AchievementService.shared.checkGameEndAchievements(gameResult: gameResult, userStats: updatedStats)
+        AchievementService.shared.checkStatsAchievements(userStats: updatedStats)
+
+        // 保存游戏历史（包含棋盘数据用于战报回看）
         let historyEntry = GameHistoryEntry(
             id: UUID().uuidString,
             userId: userId,
@@ -259,8 +278,8 @@ class GameViewModel: ObservableObject {
             players: [userId, "AI"],
             playerStats: playerStats,
             aiStats: aiStats,
-            playerBoardData: nil,
-            aiBoardData: nil
+            playerBoardData: playerBoard?.toData(),
+            aiBoardData: opponentBoard?.toData()
         )
 
         await StatisticsService.shared.saveGameHistory(
@@ -269,6 +288,21 @@ class GameViewModel: ObservableObject {
         )
 
         print("[GameViewModel] Game results saved for user: \(userId)")
+    }
+
+    // 检查是否是逆转胜利（对方已摧毁2架飞机时获胜）
+    private func checkComebackWin() -> Bool {
+        guard didPlayerWin else { return false }
+        let destroyedCount = playerBoard?.airplanes.filter { $0.isDestroyed }.count ?? 0
+        return destroyedCount >= 2
+    }
+
+    // 检查前5次攻击是否全部命中
+    private func checkFirst5AllHit() -> Bool {
+        guard let board = opponentBoard else { return false }
+        let first5 = board.attackHistory.prefix(5)
+        guard first5.count >= 5 else { return false }
+        return first5.allSatisfy { $0.result != GameConstants.AttackResult.miss.rawValue }
     }
 }
 
