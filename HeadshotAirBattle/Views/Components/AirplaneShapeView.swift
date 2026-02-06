@@ -1,12 +1,16 @@
 import SwiftUI
 
-/// Renders an airplane image with the given direction
+/// Renders a fighter jet shape using SwiftUI Path
 struct AirplaneShapeView: View {
     let direction: GameConstants.Direction
     let cellSize: CGFloat
     var showDetailedShape: Bool = true
 
-    // 飞机占用的格子范围（用于计算尺寸）
+    private var skinColor: Color {
+        Color(hex: SkinDefinitions.currentSkinColor())
+    }
+
+    // 飞机占用的格子范围
     private var airplaneSize: (rows: Int, cols: Int) {
         let cells = Airplane.calculateCells(headRow: 3, headCol: 3, direction: direction)
         let minRow = cells.map(\.row).min() ?? 0
@@ -16,67 +20,210 @@ struct AirplaneShapeView: View {
         return (maxRow - minRow + 1, maxCol - minCol + 1)
     }
 
-    // 计算机头在预览视图中的偏移量（用于拖拽定位）
-    var headOffset: CGSize {
-        let cells = Airplane.calculateCells(headRow: 3, headCol: 3, direction: direction)
-        let minRow = cells.map(\.row).min() ?? 0
-        let minCol = cells.map(\.col).min() ?? 0
-        let headRow = 3 - minRow
-        let headCol = 3 - minCol
-
-        return CGSize(
-            width: CGFloat(headCol) * cellSize + cellSize / 2,
-            height: CGFloat(headRow) * cellSize + cellSize / 2
-        )
-    }
-
-    private var rotationAngle: Angle {
-        switch direction {
-        case .up: return .degrees(0)
-        case .right: return .degrees(90)
-        case .down: return .degrees(180)
-        case .left: return .degrees(270)
-        }
-    }
-
     var body: some View {
         let size = airplaneSize
         let width = CGFloat(size.cols) * cellSize
         let height = CGFloat(size.rows) * cellSize
 
-        Image("airplane")
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .frame(width: min(width, height), height: max(width, height))
-            .rotationEffect(rotationAngle)
-            .frame(width: width, height: height)
+        ZStack {
+            // 飞机主体
+            FighterJetShape(direction: direction, cellSize: cellSize, rows: size.rows, cols: size.cols)
+                .fill(
+                    LinearGradient(
+                        colors: [skinColor, skinColor.opacity(0.7)],
+                        startPoint: gradientStart,
+                        endPoint: gradientEnd
+                    )
+                )
+
+            // 轮廓
+            FighterJetShape(direction: direction, cellSize: cellSize, rows: size.rows, cols: size.cols)
+                .stroke(skinColor.opacity(0.9), lineWidth: 1.5)
+
+            // 驾驶舱
+            CockpitShape(direction: direction, cellSize: cellSize, rows: size.rows, cols: size.cols)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.cyan.opacity(0.9), Color.blue.opacity(0.6)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        }
+        .frame(width: width, height: height)
+    }
+
+    private var gradientStart: UnitPoint {
+        switch direction {
+        case .up: return .top
+        case .down: return .bottom
+        case .left: return .leading
+        case .right: return .trailing
+        }
+    }
+
+    private var gradientEnd: UnitPoint {
+        switch direction {
+        case .up: return .bottom
+        case .down: return .top
+        case .left: return .trailing
+        case .right: return .leading
+        }
     }
 }
 
-/// 小尺寸飞机图标（用于方向选择等）
+/// 战斗机形状
+struct FighterJetShape: Shape {
+    let direction: GameConstants.Direction
+    let cellSize: CGFloat
+    let rows: Int
+    let cols: Int
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let w = CGFloat(cols) * cellSize
+        let h = CGFloat(rows) * cellSize
+
+        switch direction {
+        case .up:
+            path.move(to: CGPoint(x: w / 2, y: 0))
+            path.addLine(to: CGPoint(x: w * 0.35, y: cellSize * 0.8))
+            path.addLine(to: CGPoint(x: 0, y: cellSize * 2))
+            path.addLine(to: CGPoint(x: 0, y: cellSize * 2.3))
+            path.addLine(to: CGPoint(x: w * 0.35, y: cellSize * 1.8))
+            path.addLine(to: CGPoint(x: w * 0.35, y: cellSize * 3.2))
+            path.addLine(to: CGPoint(x: 0, y: cellSize * 3.8))
+            path.addLine(to: CGPoint(x: 0, y: h))
+            path.addLine(to: CGPoint(x: w * 0.35, y: cellSize * 3.8))
+            path.addLine(to: CGPoint(x: w * 0.5, y: h))
+            path.addLine(to: CGPoint(x: w * 0.65, y: cellSize * 3.8))
+            path.addLine(to: CGPoint(x: w, y: h))
+            path.addLine(to: CGPoint(x: w, y: cellSize * 3.8))
+            path.addLine(to: CGPoint(x: w * 0.65, y: cellSize * 3.2))
+            path.addLine(to: CGPoint(x: w * 0.65, y: cellSize * 1.8))
+            path.addLine(to: CGPoint(x: w, y: cellSize * 2.3))
+            path.addLine(to: CGPoint(x: w, y: cellSize * 2))
+            path.addLine(to: CGPoint(x: w * 0.65, y: cellSize * 0.8))
+            path.closeSubpath()
+
+        case .down:
+            path.move(to: CGPoint(x: w / 2, y: h))
+            path.addLine(to: CGPoint(x: w * 0.35, y: h - cellSize * 0.8))
+            path.addLine(to: CGPoint(x: 0, y: h - cellSize * 2))
+            path.addLine(to: CGPoint(x: 0, y: h - cellSize * 2.3))
+            path.addLine(to: CGPoint(x: w * 0.35, y: h - cellSize * 1.8))
+            path.addLine(to: CGPoint(x: w * 0.35, y: h - cellSize * 3.2))
+            path.addLine(to: CGPoint(x: 0, y: h - cellSize * 3.8))
+            path.addLine(to: CGPoint(x: 0, y: 0))
+            path.addLine(to: CGPoint(x: w * 0.35, y: h - cellSize * 3.8))
+            path.addLine(to: CGPoint(x: w * 0.5, y: 0))
+            path.addLine(to: CGPoint(x: w * 0.65, y: h - cellSize * 3.8))
+            path.addLine(to: CGPoint(x: w, y: 0))
+            path.addLine(to: CGPoint(x: w, y: h - cellSize * 3.8))
+            path.addLine(to: CGPoint(x: w * 0.65, y: h - cellSize * 3.2))
+            path.addLine(to: CGPoint(x: w * 0.65, y: h - cellSize * 1.8))
+            path.addLine(to: CGPoint(x: w, y: h - cellSize * 2.3))
+            path.addLine(to: CGPoint(x: w, y: h - cellSize * 2))
+            path.addLine(to: CGPoint(x: w * 0.65, y: h - cellSize * 0.8))
+            path.closeSubpath()
+
+        case .left:
+            path.move(to: CGPoint(x: 0, y: h / 2))
+            path.addLine(to: CGPoint(x: cellSize * 0.8, y: h * 0.35))
+            path.addLine(to: CGPoint(x: cellSize * 2, y: 0))
+            path.addLine(to: CGPoint(x: cellSize * 2.3, y: 0))
+            path.addLine(to: CGPoint(x: cellSize * 1.8, y: h * 0.35))
+            path.addLine(to: CGPoint(x: cellSize * 3.2, y: h * 0.35))
+            path.addLine(to: CGPoint(x: cellSize * 3.8, y: 0))
+            path.addLine(to: CGPoint(x: w, y: 0))
+            path.addLine(to: CGPoint(x: cellSize * 3.8, y: h * 0.35))
+            path.addLine(to: CGPoint(x: w, y: h * 0.5))
+            path.addLine(to: CGPoint(x: cellSize * 3.8, y: h * 0.65))
+            path.addLine(to: CGPoint(x: w, y: h))
+            path.addLine(to: CGPoint(x: cellSize * 3.8, y: h))
+            path.addLine(to: CGPoint(x: cellSize * 3.2, y: h * 0.65))
+            path.addLine(to: CGPoint(x: cellSize * 1.8, y: h * 0.65))
+            path.addLine(to: CGPoint(x: cellSize * 2.3, y: h))
+            path.addLine(to: CGPoint(x: cellSize * 2, y: h))
+            path.addLine(to: CGPoint(x: cellSize * 0.8, y: h * 0.65))
+            path.closeSubpath()
+
+        case .right:
+            path.move(to: CGPoint(x: w, y: h / 2))
+            path.addLine(to: CGPoint(x: w - cellSize * 0.8, y: h * 0.35))
+            path.addLine(to: CGPoint(x: w - cellSize * 2, y: 0))
+            path.addLine(to: CGPoint(x: w - cellSize * 2.3, y: 0))
+            path.addLine(to: CGPoint(x: w - cellSize * 1.8, y: h * 0.35))
+            path.addLine(to: CGPoint(x: w - cellSize * 3.2, y: h * 0.35))
+            path.addLine(to: CGPoint(x: w - cellSize * 3.8, y: 0))
+            path.addLine(to: CGPoint(x: 0, y: 0))
+            path.addLine(to: CGPoint(x: w - cellSize * 3.8, y: h * 0.35))
+            path.addLine(to: CGPoint(x: 0, y: h * 0.5))
+            path.addLine(to: CGPoint(x: w - cellSize * 3.8, y: h * 0.65))
+            path.addLine(to: CGPoint(x: 0, y: h))
+            path.addLine(to: CGPoint(x: w - cellSize * 3.8, y: h))
+            path.addLine(to: CGPoint(x: w - cellSize * 3.2, y: h * 0.65))
+            path.addLine(to: CGPoint(x: w - cellSize * 1.8, y: h * 0.65))
+            path.addLine(to: CGPoint(x: w - cellSize * 2.3, y: h))
+            path.addLine(to: CGPoint(x: w - cellSize * 2, y: h))
+            path.addLine(to: CGPoint(x: w - cellSize * 0.8, y: h * 0.65))
+            path.closeSubpath()
+        }
+
+        return path
+    }
+}
+
+/// 驾驶舱形状
+struct CockpitShape: Shape {
+    let direction: GameConstants.Direction
+    let cellSize: CGFloat
+    let rows: Int
+    let cols: Int
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let w = CGFloat(cols) * cellSize
+        let h = CGFloat(rows) * cellSize
+
+        switch direction {
+        case .up:
+            let cx = w / 2
+            let cy = cellSize * 0.6
+            path.addEllipse(in: CGRect(x: cx - cellSize * 0.25, y: cy - cellSize * 0.15,
+                                       width: cellSize * 0.5, height: cellSize * 0.35))
+        case .down:
+            let cx = w / 2
+            let cy = h - cellSize * 0.6
+            path.addEllipse(in: CGRect(x: cx - cellSize * 0.25, y: cy - cellSize * 0.2,
+                                       width: cellSize * 0.5, height: cellSize * 0.35))
+        case .left:
+            let cx = cellSize * 0.6
+            let cy = h / 2
+            path.addEllipse(in: CGRect(x: cx - cellSize * 0.15, y: cy - cellSize * 0.25,
+                                       width: cellSize * 0.35, height: cellSize * 0.5))
+        case .right:
+            let cx = w - cellSize * 0.6
+            let cy = h / 2
+            path.addEllipse(in: CGRect(x: cx - cellSize * 0.2, y: cy - cellSize * 0.25,
+                                       width: cellSize * 0.35, height: cellSize * 0.5))
+        }
+
+        return path
+    }
+}
+
+/// 小尺寸飞机图标
 struct AirplaneIconView: View {
     let direction: GameConstants.Direction
     var size: CGFloat = 60
 
-    private var rotationAngle: Angle {
-        switch direction {
-        case .up: return .degrees(0)
-        case .right: return .degrees(90)
-        case .down: return .degrees(180)
-        case .left: return .degrees(270)
-        }
-    }
-
     var body: some View {
-        Image("airplane")
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .frame(width: size, height: size)
-            .rotationEffect(rotationAngle)
+        AirplaneShapeView(direction: direction, cellSize: size / 4)
     }
 }
 
-/// 单个飞机格子视图 - 用于棋盘上显示已部署的飞机
+/// 单个飞机格子视图
 struct AirplaneCellView: View {
     let type: AirplaneCellType
     let cellSize: CGFloat
@@ -101,14 +248,10 @@ struct AirplaneCellView: View {
 
     private var cornerRadius: CGFloat {
         switch type {
-        case .head:
-            return cellSize / 2
-        case .body:
-            return cellSize * 0.2
-        case .wing:
-            return cellSize * 0.15
-        case .tail:
-            return cellSize * 0.1
+        case .head: return cellSize / 2
+        case .body: return cellSize * 0.2
+        case .wing: return cellSize * 0.15
+        case .tail: return cellSize * 0.1
         }
     }
 
@@ -159,35 +302,6 @@ struct AirplaneCellView: View {
                 .frame(width: cellSize * 0.6, height: cellSize * 0.04)
         case .tail:
             EmptyView()
-        }
-    }
-}
-
-/// 用于部署界面显示飞机的格子
-struct DeployedAirplaneCellView: View {
-    let airplane: Airplane?
-    let row: Int
-    let col: Int
-    let cellSize: CGFloat
-    let themeColors: ThemeColors
-
-    var body: some View {
-        if let airplane = airplane,
-           let cellType = airplane.getCellType(row: row, col: col) {
-            AirplaneCellView(type: cellType, cellSize: cellSize, showDetailed: true)
-                .overlay(
-                    Group {
-                        if cellType == .head {
-                            Circle()
-                                .stroke(Color.white, lineWidth: 2)
-                                .frame(width: cellSize * 0.6, height: cellSize * 0.6)
-                        }
-                    }
-                )
-        } else {
-            Rectangle()
-                .fill(Color(hex: themeColors.cellEmpty))
-                .frame(width: cellSize, height: cellSize)
         }
     }
 }
