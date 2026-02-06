@@ -1,0 +1,181 @@
+# HeadshotAirBattle iOS - Project Status
+
+## Last Updated: 2026-02-06
+
+## Project Overview
+iOS native (Swift/SwiftUI) version of HeadshotAirBattle, a battleship-style airplane combat game.
+Android version (React Native): https://github.com/skingway/HeadshotAirBattle
+
+---
+
+## Build & Install
+
+```bash
+# Build
+xcodebuild -project HeadshotAirBattle.xcodeproj -scheme HeadshotAirBattle \
+  -destination 'platform=iOS,id=00008101-000600E601A1001E' -allowProvisioningUpdates
+
+# Install
+ios-deploy --bundle "/Users/wangsisi/Library/Developer/Xcode/DerivedData/HeadshotAirBattle-fihvvnxrsthoknccbeewdozoygpc/Build/Products/Debug-iphoneos/HeadshotAirBattle.app" \
+  --id 00008101-000600E601A1001E
+```
+
+---
+
+## Feature Comparison: iOS vs Android
+
+### COMPLETED (iOS matches Android)
+
+| Feature | Status | Key Files |
+|---------|--------|-----------|
+| Main Menu | Done | `MainMenuView.swift` |
+| Single Player (Easy/Medium/Hard) | Done | `GameView.swift`, `GameViewModel.swift` |
+| Custom Mode (board size, airplane count) | Done | `CustomModeView.swift`, `SinglePlayerSetupView.swift` |
+| AI Strategy (Easy/Medium/Hard) | Done | `AIStrategy.swift`, `AIStrategyHard.swift` |
+| Deployment Phase (drag/drop airplanes) | Done | `DeploymentBoardView.swift` |
+| Battle Phase (dual board, attack) | Done | `DualBoardView.swift`, `BoardGridView.swift` |
+| Turn Timer (5 sec) | Done | `TurnTimerView.swift` |
+| Countdown (3 sec before battle) | Done | `CountdownView.swift` |
+| Game Over Screen | Done | `GameView.swift` |
+| Profile (nickname edit, 30-day cooldown) | Done | `ProfileView.swift`, `ProfileViewModel.swift` |
+| Achievements System | Done | `AchievementsView.swift`, `AchievementService.swift` |
+| Skins / Themes | Done | `SkinsView.swift`, `SkinService.swift`, `SkinDefinitions.swift` |
+| Settings (audio toggle, volume) | Done | `SettingsView.swift`, `SettingsViewModel.swift` |
+| Leaderboard (winRate/wins/totalGames) | Done | `LeaderboardView.swift`, `LeaderboardViewModel.swift` |
+| Game History (AI + online) | Done | `GameHistoryView.swift`, `GameHistoryViewModel.swift` |
+| Firebase Auth (anonymous) | Done | `AuthService.swift` |
+| Firebase Firestore (stats/history) | Done | `StatisticsService.swift` |
+| Firebase Realtime DB (online games) | Done | `MultiplayerService.swift` |
+| Online: Private Room (create/join) | Done | `OnlineModeView.swift`, `RoomService.swift` |
+| Online: Room Lobby (ready flow) | Done | `RoomLobbyView.swift`, `RoomLobbyViewModel.swift` |
+| Online: Quick Match | Done | `MatchmakingView.swift`, `MatchmakingViewModel.swift` |
+| Online: Deployment Phase | Done | `OnlineGameView.swift` |
+| Online: Battle Phase | Done | `OnlineBattleView.swift`, `OnlineGameViewModel.swift` |
+| Online: Attack (hit/miss/kill) | Done | `OnlineGameViewModel.swift` attack() |
+| Online: Turn switching (userId) | Done | currentTurn uses userId (matches Android) |
+| Online: Surrender | Done | `OnlineGameViewModel.swift` surrender() |
+| Online: Game Result (win/loss) | Done | handleStatusChange .finished |
+| Online: History Recording | Done | saveOnlineGameResult() |
+| Online: Stats Update | Done | StatisticsService.updateStatistics() |
+| Haptic Feedback (miss/hit/kill) | Done | `AudioService.swift` playVibration() |
+| Haptic: Victory/Defeat patterns | Done | `AudioService.swift` |
+| Audio: SFX framework | Done | `AudioService.swift` playSFX() |
+| Audio: BGM framework | Done | `AudioService.swift` playBGM()/stopBGM() |
+| Disconnect Handling | Done | presence tracking via Firebase |
+
+### PENDING / KNOWN ISSUES
+
+| Item | Description | Priority |
+|------|-------------|----------|
+| Audio files missing | Need 6 mp3 files in `Resources/Sounds/`: `miss.mp3`, `hit.mp3`, `kill.mp3`, `victory.mp3`, `defeat.mp3`, `bgm.mp3` | High |
+| Quick Match cross-platform | iOS-iOS tested OK for rooms. Quick Match needs more cross-platform testing (Android crash reported when Android starts first) | Medium |
+| Online: Battle Report | Android has a detailed BattleReportScreen after online games; iOS shows basic game over | Low |
+| Orientation support | iOS auto-adapts via SwiftUI but may need polish for landscape in online battle | Low |
+| Debug info in UI | RoomLobbyView and OnlineGameView have DEBUG panels visible; should hide for production | Low |
+| Achievements for online | Achievement checking not triggered for online games (only single player) | Low |
+
+---
+
+## Architecture
+
+```
+HeadshotAirBattle/
+├── App/                    # App entry point, navigation
+│   ├── HeadshotAirBattleApp.swift
+│   └── ContentView.swift   # NavigationStack + route definitions
+├── Models/
+│   ├── Airplane.swift       # 10-cell airplane with hit detection
+│   ├── BoardManager.swift   # Grid management, attack processing
+│   ├── CoordinateSystem.swift
+│   ├── GameConstants.swift  # All enums, constants, config
+│   ├── GameState.swift      # GameResult struct
+│   ├── FirebaseModels.swift # Statistics, GameHistoryEntry, etc.
+│   ├── SkinDefinitions.swift
+│   └── AchievementDefinitions.swift
+├── Services/
+│   ├── AudioService.swift       # SFX, BGM, haptic feedback
+│   ├── AuthService.swift        # Firebase anonymous auth
+│   ├── StatisticsService.swift  # Stats, history, leaderboard
+│   ├── AchievementService.swift
+│   ├── MultiplayerService.swift # Online game CRUD
+│   ├── MatchmakingService.swift
+│   ├── RoomService.swift        # Private room codes
+│   ├── SkinService.swift
+│   └── FirebaseService.swift
+├── ViewModels/
+│   ├── GameViewModel.swift          # Single player game logic
+│   ├── OnlineGameViewModel.swift    # Online PvP game logic
+│   ├── MatchmakingViewModel.swift   # Quick match
+│   ├── RoomLobbyViewModel.swift     # Room ready flow
+│   ├── AppViewModel.swift           # Global app state
+│   └── ... (other VMs)
+├── Views/
+│   ├── Screens/
+│   │   ├── MainMenuView.swift
+│   │   ├── GameView.swift           # Single player
+│   │   ├── OnlineGameView.swift     # Online wrapper
+│   │   ├── OnlineModeView.swift     # Online menu
+│   │   ├── MatchmakingView.swift
+│   │   ├── RoomLobbyView.swift
+│   │   └── ... (other screens)
+│   └── Components/
+│       ├── OnlineBattleView.swift   # Online battle board
+│       ├── DualBoardView.swift      # AI battle board
+│       ├── DeploymentBoardView.swift
+│       ├── BoardGridView.swift
+│       ├── CellView.swift
+│       ├── CountdownView.swift
+│       └── TurnTimerView.swift
+├── AI/
+│   ├── AIStrategy.swift        # Easy + Medium
+│   └── AIStrategyHard.swift    # Hard (Ultra V2)
+├── Utilities/
+│   └── Extensions.swift
+└── Resources/
+    ├── Sounds/                 # EMPTY - needs mp3 files
+    └── Assets.xcassets/
+```
+
+---
+
+## Key Technical Details
+
+### Firebase Configuration
+- **Database URL**: `https://airplane-battle-7a3fd-default-rtdb.firebaseio.com`
+- **Realtime DB path**: `activeGames/{gameId}`
+- **Firestore collections**: `users`, `gameHistory`, `matchmakingQueue`, `roomCodes`
+
+### Online Game Data Flow
+```
+waiting → deploying → battle → finished
+```
+
+### Field Compatibility (iOS <-> Android)
+- Ready state: Writes both `playerReady` and `ready` fields
+- Deployment: Writes both `deploymentReady` and `ready` + `board` data
+- currentTurn: Uses **userId** (not "player1"/"player2" role)
+- Attacks: Stored under `{role}/attacks/{pushKey}` with result field
+- Stats: Stored under `{role}/stats` with hits/misses/kills
+
+### Device Info
+- Test device ID: `00008101-000600E601A1001E` (device name: sisi)
+- Min iOS version: 16.0
+- Build target: arm64
+
+---
+
+## Recent Changes (2026-02-06)
+
+1. **Fixed online Ready flow** - Both players must click Ready before deployment
+2. **Fixed currentTurn** - Uses userId instead of role (matches Android)
+3. **Created OnlineBattleView** - Proper online battle view with attack tracking
+4. **Fixed attack system** - Calculates hit/miss/kill locally, sends result to Firebase
+5. **Added attack visualization** - Shows hit (flame), miss (dot), kill (X) on boards
+6. **Fixed Quick Match** - Creates game in Realtime DB, both players go to RoomLobby
+7. **Fixed RoomLobby navigation** - Only navigates when both Ready AND status=deploying
+8. **Added game history recording** - Online games saved to Firestore + local
+9. **Added statistics update** - Online wins/losses tracked in leaderboard
+10. **Added haptic feedback** - miss(light), hit(medium), kill(pattern) vibrations
+11. **Added audio SFX calls** - playSFX for hit/miss/kill in online attacks
+12. **Added BGM** - Starts on battle, stops on finish
+13. **Added surrender** - With confirmation and proper stat recording

@@ -38,7 +38,9 @@ class MultiplayerService {
             "player1": [
                 "id": player.id,
                 "nickname": player.nickname,
-                "ready": false,
+                "playerReady": false,
+                "ready": false,  // 兼容安卓
+                "deploymentReady": false,
                 "connected": true,
                 "stats": ["hits": 0, "misses": 0, "kills": 0]
             ],
@@ -65,13 +67,15 @@ class MultiplayerService {
         let playerData: [String: Any] = [
             "id": userId,
             "nickname": nickname,
-            "ready": false,
+            "playerReady": false,
+            "ready": false,  // 兼容安卓
+            "deploymentReady": false,
             "connected": true,
             "stats": ["hits": 0, "misses": 0, "kills": 0]
         ]
 
         try await ref.child("player2").setValue(playerData)
-        try await ref.child("status").setValue("deploying")
+        // 不要立即设置 deploying 状态，等双方都 Ready 后再进入部署阶段
 
         currentGameId = gameId
         myRole = "player2"

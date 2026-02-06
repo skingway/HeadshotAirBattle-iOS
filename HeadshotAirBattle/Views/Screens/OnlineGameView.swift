@@ -33,12 +33,86 @@ struct OnlineGameView: View {
 
                 switch viewModel.gameStatus {
                 case .waiting:
-                    VStack(spacing: 16) {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .tint(.cyan)
-                        Text("Waiting for opponent to join...")
+                    VStack(spacing: 20) {
+                        if viewModel.opponentNickname.isEmpty {
+                            // 等待对手加入
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                .tint(.cyan)
+                            Text("Waiting for opponent to join...")
+                                .foregroundColor(.gray)
+                        } else {
+                            // 对手已加入，显示 Ready 按钮
+                            VStack(spacing: 16) {
+                                Image(systemName: "person.2.fill")
+                                    .font(.system(size: 50))
+                                    .foregroundColor(.cyan)
+
+                                Text("\(viewModel.opponentNickname) joined!")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+
+                                // Ready 状态指示
+                                HStack(spacing: 30) {
+                                    VStack {
+                                        Circle()
+                                            .fill(viewModel.isPlayerReady ? Color.green : Color.gray)
+                                            .frame(width: 20, height: 20)
+                                        Text("You")
+                                            .font(.caption)
+                                            .foregroundColor(.white)
+                                    }
+
+                                    VStack {
+                                        Circle()
+                                            .fill(viewModel.opponentReady ? Color.green : Color.gray)
+                                            .frame(width: 20, height: 20)
+                                        Text("Opponent")
+                                            .font(.caption)
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                                .padding()
+
+                                if viewModel.isPlayerReady {
+                                    // 已点击 Ready，等待对手
+                                    HStack {
+                                        ProgressView()
+                                            .tint(.cyan)
+                                        Text("Waiting for opponent to ready...")
+                                            .foregroundColor(.yellow)
+                                    }
+                                } else {
+                                    // 显示 Ready 按钮
+                                    Button(action: {
+                                        viewModel.clickReady()
+                                    }) {
+                                        Text("READY")
+                                            .font(.title2.bold())
+                                            .foregroundColor(.white)
+                                            .frame(width: 200, height: 60)
+                                            .background(Color.green)
+                                            .cornerRadius(12)
+                                    }
+                                }
+                            }
+
+                            // 调试信息
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("DEBUG:")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.orange)
+                                Text("myRole: \(viewModel.myRole)")
+                                Text("isPlayerReady: \(viewModel.isPlayerReady ? "YES" : "NO")")
+                                Text("opponentReady: \(viewModel.opponentReady ? "YES" : "NO")")
+                                Text("status: \(viewModel.gameStatus.rawValue)")
+                            }
+                            .font(.caption)
                             .foregroundColor(.gray)
+                            .padding(8)
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(8)
+                        }
                     }
 
                 case .deploying:
@@ -81,22 +155,7 @@ struct OnlineGameView: View {
                     }
 
                 case .battle:
-                    VStack(spacing: 8) {
-                        // 回合指示
-                        HStack {
-                            Circle()
-                                .fill(viewModel.isMyTurn ? Color.green : Color.red)
-                                .frame(width: 12, height: 12)
-                            Text(viewModel.isMyTurn ? "Your Turn" : "Opponent's Turn")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                        }
-
-                        DualBoardView(viewModel: viewModel.battleHelper)
-
-                        // 游戏日志
-                        GameLogView(logs: viewModel.gameLog)
-                    }
+                    OnlineBattleView(viewModel: viewModel)
 
                 case .finished:
                     VStack(spacing: 20) {

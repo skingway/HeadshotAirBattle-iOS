@@ -122,7 +122,8 @@ struct OnlineModeView: View {
             )
 
             await MainActor.run {
-                navigationPath.append(AppRoute.onlineGame(gameId: gameId))
+                // 加入房间后也去 RoomLobbyView，显示 Ready 按钮
+                navigationPath.append(AppRoute.roomLobby(gameId: gameId, roomCode: code))
             }
         } catch {
             print("[OnlineModeView] Join room error: \(error)")

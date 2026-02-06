@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseFirestore
+import FirebaseDatabase
 
 @MainActor
 class MatchmakingViewModel: ObservableObject {
@@ -7,16 +8,20 @@ class MatchmakingViewModel: ObservableObject {
     @Published var matchedGameId: String?
     @Published var errorMessage: String?
     @Published var isSearching = false
+    @Published var isPlayer1 = false  // 是否是创建游戏的人
 
     private var timer: Timer?
     private var matchTimer: Timer?
     private var timeRemaining: TimeInterval = 60
     private let db = Firestore.firestore()
+    private let rtdb = Database.database(url: "https://airplane-battle-7a3fd-default-rtdb.firebaseio.com")
     private var userId: String = ""
+    private var nickname: String = ""
     private var listener: ListenerRegistration?
 
     func startMatchmaking(mode: String, userId: String, nickname: String, stats: UserProfile?) {
         self.userId = userId
+        self.nickname = nickname
         isSearching = true
         timeRemaining = GameConstants.Network.matchmakingTimeout
 
@@ -49,14 +54,27 @@ class MatchmakingViewModel: ObservableObject {
         // Listen for match
         listener = db.collection("matchmakingQueue").document(userId)
             .addSnapshotListener { [weak self] snapshot, error in
-                guard let data = snapshot?.data(),
+                guard let self = self,
+                      let data = snapshot?.data(),
                       let status = data["status"] as? String,
                       status == "matched",
                       let matchId = data["matchId"] as? String else { return }
 
+                let amIPlayer1 = data["isPlayer1"] as? Bool ?? false
+
                 Task { @MainActor in
-                    self?.matchedGameId = matchId
-                    self?.cleanup()
+                    self.isPlayer1 = amIPlayer1
+
+                    if amIPlayer1 {
+                        // 我是 player1，游戏已经创建，直接跳转
+                        NSLog("[MatchmakingVM] I am player1, game ready: \(matchId)")
+                        self.matchedGameId = matchId
+                        self.cleanup()
+                    } else {
+                        // 我是 player2，需要先加入游戏
+                        NSLog("[MatchmakingVM] I am player2, joining game: \(matchId)")
+                        await self.joinGameAsPlayer2(gameId: matchId)
+                    }
                 }
             }
 
@@ -101,13 +119,76 @@ class MatchmakingViewModel: ObservableObject {
                     return nil
                 }
 
-                transaction.updateData(["status": "matched", "matchId": gameId], forDocument: myRef)
-                transaction.updateData(["status": "matched", "matchId": gameId], forDocument: opRef)
+                transaction.updateData(["status": "matched", "matchId": gameId, "isPlayer1": true], forDocument: myRef)
+                transaction.updateData(["status": "matched", "matchId": gameId, "isPlayer1": false], forDocument: opRef)
 
                 return nil
             }
+
+            // 创建游戏到 Realtime Database（作为 player1）
+            await createGameInRealtimeDatabase(gameId: gameId, mode: mode)
+
         } catch {
             print("[MatchmakingVM] Match check error: \(error.localizedDescription)")
+        }
+    }
+
+    /// 在 Realtime Database 创建游戏（和 Android 一致）
+    private func createGameInRealtimeDatabase(gameId: String, mode: String) async {
+        let gameData: [String: Any] = [
+            "gameId": gameId,
+            "gameType": "quickMatch",
+            "status": "waiting",
+            "mode": mode,
+            "boardSize": 10,
+            "airplaneCount": 3,
+            "createdAt": ServerValue.timestamp(),
+            "player1": [
+                "id": userId,
+                "nickname": nickname,
+                "connected": true,
+                "playerReady": false,
+                "ready": false,
+                "deploymentReady": false,
+                "attacks": [:] as [String: Any],
+                "stats": ["hits": 0, "misses": 0, "kills": 0]
+            ],
+            "currentTurn": NSNull(),
+            "turnStartedAt": NSNull(),
+            "winner": NSNull()
+        ]
+
+        do {
+            try await rtdb.reference().child("activeGames").child(gameId).setValue(gameData)
+            NSLog("[MatchmakingVM] Game created in Realtime Database: \(gameId)")
+        } catch {
+            NSLog("[MatchmakingVM] Failed to create game: \(error.localizedDescription)")
+        }
+    }
+
+    /// 作为 player2 加入游戏（和 Android 的 MultiplayerService.joinGame 一致）
+    private func joinGameAsPlayer2(gameId: String) async {
+        let player2Data: [String: Any] = [
+            "id": userId,
+            "nickname": nickname,
+            "connected": true,
+            "playerReady": false,
+            "ready": false,
+            "deploymentReady": false,
+            "attacks": [:] as [String: Any],
+            "stats": ["hits": 0, "misses": 0, "kills": 0]
+        ]
+
+        do {
+            try await rtdb.reference().child("activeGames").child(gameId).child("player2").setValue(player2Data)
+            NSLog("[MatchmakingVM] Joined game as player2: \(gameId)")
+
+            // 加入成功后设置 matchedGameId
+            self.matchedGameId = gameId
+            self.cleanup()
+        } catch {
+            NSLog("[MatchmakingVM] Failed to join game: \(error.localizedDescription)")
+            self.errorMessage = "Failed to join game"
         }
     }
 

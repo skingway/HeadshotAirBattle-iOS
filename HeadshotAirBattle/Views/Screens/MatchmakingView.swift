@@ -55,7 +55,8 @@ struct MatchmakingView: View {
         .onChange(of: viewModel.matchedGameId) { gameId in
             if let gameId = gameId {
                 navigationPath.removeLast()
-                navigationPath.append(AppRoute.onlineGame(gameId: gameId))
+                // 匹配成功后跳转到 RoomLobby（和 Android 一致），让双方点击 Ready
+                navigationPath.append(AppRoute.roomLobby(gameId: gameId, roomCode: nil))
             }
         }
     }

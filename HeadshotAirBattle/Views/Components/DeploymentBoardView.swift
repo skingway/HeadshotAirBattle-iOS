@@ -22,11 +22,9 @@ struct DeploymentBoardView: View {
         return min(max(size, GameConstants.GridDisplay.minCellSize), GameConstants.GridDisplay.maxCellSize)
     }
 
-    // 标签偏移量
     private let labelOffsetX: CGFloat = 24
     private let labelOffsetY: CGFloat = 16
 
-    // 棋盘总尺寸（固定，防止布局变化）
     private var boardWidth: CGFloat {
         labelOffsetX + CGFloat(boardSize) * cellSize
     }
@@ -45,13 +43,11 @@ struct DeploymentBoardView: View {
                 .font(.caption)
                 .foregroundColor(.gray)
 
-            // 棋盘区域 - 固定尺寸
+            // 棋盘区域
             if let board = viewModel.playerBoard {
                 ZStack(alignment: .topLeading) {
-                    // 棋盘网格
                     boardGrid(board: board)
 
-                    // 拖拽预览叠加层（不影响布局）
                     if isDragging && dragHeadRow >= -2 && dragHeadCol >= -2 {
                         dragPreviewOverlay(board: board)
                             .allowsHitTesting(false)
@@ -71,70 +67,119 @@ struct DeploymentBoardView: View {
                 }
             }
 
-            // 错误提示 - 固定高度防止布局跳动
+            // 错误提示
             Text(showPlacementError ? "Cannot place airplane here" : " ")
                 .font(.caption)
                 .foregroundColor(.red)
                 .frame(height: 20)
 
-            // 飞机图标和控制按钮
-            HStack(spacing: 20) {
-                // 可拖拽的飞机图标
-                AirplaneIconView(direction: selectedDirection, size: 80)
-                    .opacity(isDragging ? 0.3 : 1.0)
-                    .gesture(
-                        DragGesture(coordinateSpace: .global)
-                            .onChanged { value in
-                                isDragging = true
-                                updateDragPosition(globalLocation: value.location)
-                            }
-                            .onEnded { _ in
-                                placeDraggedAirplane()
-                                isDragging = false
-                                dragHeadRow = -1
-                                dragHeadCol = -1
-                            }
-                    )
+            // 控制区域 - 居中布局
+            VStack(spacing: 16) {
+                // 飞机预览和旋转按钮
+                HStack(spacing: 20) {
+                    // 可拖拽的飞机格子预览
+                    airplanePreview
+                        .opacity(isDragging ? 0.3 : 1.0)
+                        .gesture(
+                            DragGesture(coordinateSpace: .global)
+                                .onChanged { value in
+                                    isDragging = true
+                                    updateDragPosition(globalLocation: value.location)
+                                }
+                                .onEnded { _ in
+                                    placeDraggedAirplane()
+                                    isDragging = false
+                                    dragHeadRow = -1
+                                    dragHeadCol = -1
+                                }
+                        )
 
-                VStack(spacing: 12) {
                     Button(action: rotateDirection) {
-                        Label("Rotate", systemImage: "arrow.triangle.2.circlepath")
+                        VStack(spacing: 4) {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                .font(.title2)
+                            Text("Rotate")
+                                .font(.caption)
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                }
+
+                // 操作按钮
+                HStack(spacing: 16) {
+                    Button(action: { viewModel.deployAirplanesRandomly() }) {
+                        Label("Random", systemImage: "dice.fill")
                     }
                     .buttonStyle(.bordered)
 
-                    HStack(spacing: 12) {
-                        Button(action: { viewModel.deployAirplanesRandomly() }) {
-                            Label("Random", systemImage: "dice.fill")
-                        }
-                        .buttonStyle(.bordered)
-
-                        Button(action: { viewModel.clearDeployment() }) {
-                            Label("Clear", systemImage: "trash")
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(.red)
+                    Button(action: { viewModel.clearDeployment() }) {
+                        Label("Clear", systemImage: "trash")
                     }
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+                }
+
+                // 开始战斗按钮
+                if viewModel.isDeploymentComplete() {
+                    Button("Start Battle") {
+                        viewModel.confirmDeployment()
+                    }
+                    .font(.headline)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.green)
                 }
             }
 
-            // 开始战斗按钮
-            if viewModel.isDeploymentComplete() {
-                Button("Start Battle") {
-                    viewModel.confirmDeployment()
-                }
-                .font(.headline)
-                .buttonStyle(.borderedProminent)
-                .tint(.green)
-            }
-
-            Text("Drag airplane to board or tap cell to place")
+            Text("Drag airplane to board or tap cell")
                 .font(.caption2)
                 .foregroundColor(.gray)
         }
         .padding()
     }
 
-    // 拖拽预览叠加层
+    // 飞机格子预览（简单的格子显示）
+    @ViewBuilder
+    private var airplanePreview: some View {
+        let previewCellSize: CGFloat = 18
+        let cells = Airplane.calculateCells(headRow: 3, headCol: 3, direction: selectedDirection)
+        let minRow = cells.map(\.row).min() ?? 0
+        let minCol = cells.map(\.col).min() ?? 0
+        let maxRow = cells.map(\.row).max() ?? 0
+        let maxCol = cells.map(\.col).max() ?? 0
+        let rows = maxRow - minRow + 1
+        let cols = maxCol - minCol + 1
+
+        VStack(spacing: 1) {
+            ForEach(0..<rows, id: \.self) { r in
+                HStack(spacing: 1) {
+                    ForEach(0..<cols, id: \.self) { c in
+                        let row = r + minRow
+                        let col = c + minCol
+                        let cell = cells.first { $0.row == row && $0.col == col }
+
+                        if let cell = cell {
+                            RoundedRectangle(cornerRadius: cell.type == .head ? previewCellSize / 2 : 2)
+                                .fill(cell.type == .head ? Color.cyan : Color(hex: SkinDefinitions.currentSkinColor()))
+                                .frame(width: previewCellSize, height: previewCellSize)
+                                .overlay(
+                                    Group {
+                                        if cell.type == .head {
+                                            Circle()
+                                                .stroke(Color.white, lineWidth: 1)
+                                                .frame(width: previewCellSize * 0.6, height: previewCellSize * 0.6)
+                                        }
+                                    }
+                                )
+                        } else {
+                            Color.clear
+                                .frame(width: previewCellSize, height: previewCellSize)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @ViewBuilder
     private func dragPreviewOverlay(board: BoardManager) -> some View {
         let cells = Airplane.calculateCells(headRow: dragHeadRow, headCol: dragHeadCol, direction: selectedDirection)
@@ -180,7 +225,6 @@ struct DeploymentBoardView: View {
     @ViewBuilder
     private func boardGrid(board: BoardManager) -> some View {
         VStack(spacing: 0) {
-            // 列标签
             HStack(spacing: 0) {
                 Color.clear.frame(width: labelOffsetX, height: labelOffsetY)
                 ForEach(0..<board.size, id: \.self) { col in
@@ -191,16 +235,13 @@ struct DeploymentBoardView: View {
                 }
             }
 
-            // 行
             ForEach(0..<board.size, id: \.self) { row in
                 HStack(spacing: 0) {
-                    // 行标签
                     Text("\(row + 1)")
                         .font(.system(size: min(cellSize * 0.4, 10)))
                         .foregroundColor(.gray)
                         .frame(width: labelOffsetX, height: cellSize)
 
-                    // 格子
                     ForEach(0..<board.size, id: \.self) { col in
                         cellView(board: board, row: row, col: col)
                     }
@@ -246,6 +287,7 @@ struct DeploymentBoardView: View {
         let relativeX = globalLocation.x - gridOriginInGlobal.x - labelOffsetX
         let relativeY = globalLocation.y - gridOriginInGlobal.y - labelOffsetY
 
+        // 手指指向机头位置（不加偏移，更直观）
         let col = Int(relativeX / cellSize)
         let row = Int(relativeY / cellSize)
 
