@@ -136,10 +136,12 @@ class BoardManager {
         if isAttacked {
             if let airplane = airplane {
                 if airplane.isCellHit(row: row, col: col) {
-                    if airplane.isDestroyed {
-                        return .killed  // 飞机被摧毁后，所有已击中格子都显示 killed
+                    // 只有机头显示 killed（X标记），其他部位显示 hit（火焰）
+                    let cellType = airplane.getCellType(row: row, col: col)
+                    if airplane.isDestroyed && cellType == .head {
+                        return .killed  // 只有机头显示 killed
                     }
-                    return .hit
+                    return .hit  // 机身、机翼、尾翼都显示 hit（火焰图标）
                 }
             }
             return .miss

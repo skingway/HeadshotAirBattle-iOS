@@ -6,7 +6,8 @@ struct DeploymentBoardView: View {
     @State private var selectedDirection: GameConstants.Direction = .up
     @State private var isDragging = false
     @State private var dragPosition: CGPoint = .zero
-    @State private var boardFrame: CGRect = .zero
+    @State private var boardOrigin: CGPoint = .zero
+    @State private var showPlacementError = false
     private let themeColors = SkinDefinitions.currentThemeColors()
 
     private var cellSize: CGFloat {
@@ -34,11 +35,22 @@ struct DeploymentBoardView: View {
                         boardGrid(board: board)
                             .background(
                                 GeometryReader { boardGeometry in
-                                    Color.clear.onAppear {
-                                        boardFrame = boardGeometry.frame(in: .global)
-                                    }
+                                    Color.clear
+                                        .onAppear {
+                                            boardOrigin = boardGeometry.frame(in: .global).origin
+                                        }
+                                        .onChange(of: boardGeometry.frame(in: .global)) { newFrame in
+                                            boardOrigin = newFrame.origin
+                                        }
                                 }
                             )
+                    }
+
+                    if showPlacementError {
+                        Text("Cannot place airplane here")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .transition(.opacity)
                     }
 
                     // Airplane preview - draggable
@@ -171,8 +183,8 @@ struct DeploymentBoardView: View {
         guard let board = viewModel.playerBoard else { return }
 
         // 计算相对于棋盘的位置
-        let relativeX = globalLocation.x - boardFrame.minX
-        let relativeY = globalLocation.y - boardFrame.minY
+        let relativeX = globalLocation.x - boardOrigin.x
+        let relativeY = globalLocation.y - boardOrigin.y
 
         // 考虑坐标轴标签的宽度
         let gridOriginX: CGFloat = 24  // 行标签宽度
@@ -182,13 +194,35 @@ struct DeploymentBoardView: View {
         let col = Int((relativeX - gridOriginX) / cellSize)
         let row = Int((relativeY - gridOriginY) / cellSize)
 
+        print("[DeploymentBoardView] Drop at global: \(globalLocation), boardOrigin: \(boardOrigin)")
+        print("[DeploymentBoardView] Relative: (\(relativeX), \(relativeY)) -> row: \(row), col: \(col)")
+
         // 边界检查
         guard row >= 0 && row < board.size && col >= 0 && col < board.size else {
+            print("[DeploymentBoardView] Out of bounds")
             return
         }
 
-        // 尝试放置飞机（复用现有的点击逻辑）
-        handleCellTap(row: row, col: col)
+        // 检查是否已有飞机，有则移除
+        if let airplane = board.getAirplaneAt(row: row, col: col) {
+            viewModel.removeAirplane(id: airplane.id)
+            return
+        }
+
+        // 尝试放置飞机
+        let success = viewModel.addAirplane(headRow: row, headCol: col, direction: selectedDirection)
+        print("[DeploymentBoardView] Place airplane at (\(row), \(col)) direction: \(selectedDirection): \(success)")
+
+        if !success {
+            withAnimation {
+                showPlacementError = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation {
+                    showPlacementError = false
+                }
+            }
+        }
     }
 
     private func rotateDirection() {

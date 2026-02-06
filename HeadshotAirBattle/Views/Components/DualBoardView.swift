@@ -5,6 +5,11 @@ struct DualBoardView: View {
     @ObservedObject var viewModel: GameViewModel
     private let themeColors = SkinDefinitions.currentThemeColors()
 
+    // 使用 totalTurns 作为刷新触发器，确保每次攻击后视图刷新
+    private var refreshTrigger: Int {
+        viewModel.totalTurns
+    }
+
     var body: some View {
         VStack(spacing: 8) {
             // Turn indicator
@@ -25,9 +30,18 @@ struct DualBoardView: View {
 
             // Opponent board (attack target)
             VStack(spacing: 4) {
-                Text("Enemy Fleet")
-                    .font(.caption.bold())
-                    .foregroundColor(.cyan)
+                HStack {
+                    Text("Enemy Fleet")
+                        .font(.caption.bold())
+                        .foregroundColor(.cyan)
+                    Spacer()
+                    if let board = viewModel.opponentBoard {
+                        Text("Remaining: \(board.getRemainingAirplaneCount())")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                }
+                .padding(.horizontal, 30)
 
                 if let board = viewModel.opponentBoard {
                     BoardGridView(
@@ -39,14 +53,24 @@ struct DualBoardView: View {
                             viewModel.playerAttack(row: row, col: col)
                         }
                     )
+                    .id(refreshTrigger) // 强制刷新
                 }
             }
 
             // Player board (reveal own airplanes)
             VStack(spacing: 4) {
-                Text("Your Fleet")
-                    .font(.caption.bold())
-                    .foregroundColor(.green)
+                HStack {
+                    Text("Your Fleet")
+                        .font(.caption.bold())
+                        .foregroundColor(.green)
+                    Spacer()
+                    if let board = viewModel.playerBoard {
+                        Text("Remaining: \(board.getRemainingAirplaneCount())")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                }
+                .padding(.horizontal, 30)
 
                 if let board = viewModel.playerBoard {
                     BoardGridView(
@@ -55,6 +79,7 @@ struct DualBoardView: View {
                         isInteractive: false,
                         themeColors: themeColors
                     )
+                    .id(refreshTrigger) // 强制刷新
                 }
             }
 
