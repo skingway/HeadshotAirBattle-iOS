@@ -99,12 +99,18 @@ struct DeploymentBoardView: View {
                 }
                 .padding()
 
-                // Drag preview overlay - follows finger exactly
+                // Drag preview overlay - 机头跟随手指位置
                 if isDragging {
-                    AirplaneShapeView(direction: selectedDirection, cellSize: cellSize)
+                    let preview = AirplaneShapeView(direction: selectedDirection, cellSize: cellSize)
+                    let headOffset = preview.headOffset
+                    let geometryOrigin = geometry.frame(in: .global).origin
+
+                    preview
                         .opacity(0.7)
-                        .position(x: dragPosition.x - geometry.frame(in: .global).minX,
-                                  y: dragPosition.y - geometry.frame(in: .global).minY)
+                        .position(
+                            x: dragPosition.x - geometryOrigin.x - headOffset.width + cellSize / 2,
+                            y: dragPosition.y - geometryOrigin.y - headOffset.height + cellSize / 2
+                        )
                         .allowsHitTesting(false)
                 }
             }
@@ -134,35 +140,25 @@ struct DeploymentBoardView: View {
                         .frame(width: 24)
 
                     ForEach(0..<board.size, id: \.self) { col in
-                        let hasAirplane = board.hasAirplaneAt(row: row, col: col)
-                        Rectangle()
-                            .fill(hasAirplane ? Color(hex: SkinDefinitions.currentSkinColor()) : Color(hex: themeColors.cellEmpty))
-                            .frame(width: cellSize, height: cellSize)
-                            .overlay(
-                                Rectangle()
-                                    .stroke(Color(hex: themeColors.gridLine), lineWidth: 0.5)
-                            )
-                            .overlay(
-                                headIndicator(board: board, row: row, col: col)
-                            )
-                            .onTapGesture {
-                                handleCellTap(row: row, col: col)
-                            }
+                        let airplane = board.getAirplaneAt(row: row, col: col)
+
+                        DeployedAirplaneCellView(
+                            airplane: airplane,
+                            row: row,
+                            col: col,
+                            cellSize: cellSize,
+                            themeColors: themeColors
+                        )
+                        .overlay(
+                            Rectangle()
+                                .stroke(Color(hex: themeColors.gridLine), lineWidth: 0.5)
+                        )
+                        .onTapGesture {
+                            handleCellTap(row: row, col: col)
+                        }
                     }
                 }
             }
-        }
-    }
-
-    @ViewBuilder
-    private func headIndicator(board: BoardManager, row: Int, col: Int) -> some View {
-        if let airplane = board.getAirplaneAt(row: row, col: col),
-           airplane.getCellType(row: row, col: col) == .head {
-            Circle()
-                .fill(Color.white)
-                .frame(width: cellSize * 0.4, height: cellSize * 0.4)
-        } else {
-            EmptyView()
         }
     }
 
