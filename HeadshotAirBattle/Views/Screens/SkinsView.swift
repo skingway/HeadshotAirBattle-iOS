@@ -4,6 +4,8 @@ struct SkinsView: View {
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var appViewModel: AppViewModel
     @StateObject private var viewModel = SkinsViewModel()
+    @State private var showUnlockAlert = false
+    @State private var unlockMessage = ""
 
     var body: some View {
         ZStack {
@@ -24,13 +26,19 @@ struct SkinsView: View {
                         ], spacing: 12) {
                             ForEach(SkinDefinitions.airplaneSkins, id: \.id) { skin in
                                 let totalGames = appViewModel.userProfile?.totalGames ?? 0
+                                let isUnlocked = viewModel.isSkinUnlocked(skin, totalGames: totalGames)
                                 SkinCard(
                                     skin: skin,
                                     isSelected: viewModel.currentSkinId == skin.id,
-                                    isUnlocked: viewModel.isSkinUnlocked(skin, totalGames: totalGames),
+                                    isUnlocked: isUnlocked,
                                     progressText: viewModel.skinUnlockProgress(skin, totalGames: totalGames)
                                 ) {
-                                    viewModel.selectSkin(skin.id)
+                                    if isUnlocked {
+                                        viewModel.selectSkin(skin.id)
+                                    } else {
+                                        unlockMessage = viewModel.skinUnlockProgress(skin, totalGames: totalGames)
+                                        showUnlockAlert = true
+                                    }
                                 }
                             }
                         }
@@ -48,13 +56,19 @@ struct SkinsView: View {
                         ], spacing: 12) {
                             ForEach(SkinDefinitions.boardThemes, id: \.id) { theme in
                                 let totalWins = appViewModel.userProfile?.wins ?? 0
+                                let isUnlocked = viewModel.isThemeUnlocked(theme, totalWins: totalWins)
                                 ThemeCard(
                                     theme: theme,
                                     isSelected: viewModel.currentThemeId == theme.id,
-                                    isUnlocked: viewModel.isThemeUnlocked(theme, totalWins: totalWins),
+                                    isUnlocked: isUnlocked,
                                     progressText: viewModel.themeUnlockProgress(theme, totalWins: totalWins)
                                 ) {
-                                    viewModel.selectTheme(theme.id)
+                                    if isUnlocked {
+                                        viewModel.selectTheme(theme.id)
+                                    } else {
+                                        unlockMessage = viewModel.themeUnlockProgress(theme, totalWins: totalWins)
+                                        showUnlockAlert = true
+                                    }
                                 }
                             }
                         }
@@ -66,6 +80,11 @@ struct SkinsView: View {
         .navigationTitle("Skins & Themes")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { viewModel.load() }
+        .alert("Locked", isPresented: $showUnlockAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(unlockMessage)
+        }
     }
 }
 
@@ -77,7 +96,7 @@ struct SkinCard: View {
     let onSelect: () -> Void
 
     var body: some View {
-        Button(action: { if isUnlocked { onSelect() } }) {
+        Button(action: onSelect) {
             VStack(spacing: 8) {
                 Circle()
                     .fill(Color(hex: skin.color))
@@ -114,7 +133,7 @@ struct ThemeCard: View {
     let onSelect: () -> Void
 
     var body: some View {
-        Button(action: { if isUnlocked { onSelect() } }) {
+        Button(action: onSelect) {
             VStack(spacing: 8) {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(Color(hex: theme.colors.background))
