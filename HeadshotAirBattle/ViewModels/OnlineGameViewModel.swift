@@ -235,6 +235,18 @@ class OnlineGameViewModel: ObservableObject {
         }
     }
 
+    /// 检查前5次攻击是否全部命中（用于先知成就）
+    private func checkFirst5AllHit() -> Bool {
+        // 获取按时间排序的前5次攻击
+        let sortedAttacks = myAttacks.sorted { $0.key < $1.key }.prefix(5)
+        guard sortedAttacks.count >= 5 else { return false }
+
+        // 检查是否全部命中（hit 或 kill）
+        return sortedAttacks.allSatisfy { _, result in
+            result == "hit" || result == "kill"
+        }
+    }
+
     /// 保存在线游戏结果到历史记录和统计数据
     private func saveOnlineGameResult(data: [String: Any]) {
         guard !userId.isEmpty else { return }
@@ -296,11 +308,34 @@ class OnlineGameViewModel: ObservableObject {
 
         Task {
             // 更新统计数据（包含 Leaderboard）
-            _ = await StatisticsService.shared.updateStatistics(
+            let updatedStats = await StatisticsService.shared.updateStatistics(
                 userId: userId,
                 isWinner: didWin,
                 isOnlineGame: true
             )
+
+            // 检查成就
+            await MainActor.run {
+                // 构建 GameResult 用于游戏结束成就检查
+                let gameResult = GameResult(
+                    winner: didWin ? "player" : "opponent",
+                    totalTurns: myAttacks.count,
+                    playerStats: myStats,
+                    aiStats: opponentStats,
+                    comebackWin: false, // 在线游戏暂不检测
+                    first5AllHit: checkFirst5AllHit(),
+                    boardSize: boardSize,
+                    airplaneCount: airplaneCount,
+                    gameType: .online,
+                    opponent: opponentNickname
+                )
+
+                // 检查游戏结束成就（如神枪手、闪电战等）
+                AchievementService.shared.checkGameEndAchievements(gameResult: gameResult, userStats: updatedStats)
+
+                // 检查统计成就（如战术家、连胜等）
+                AchievementService.shared.checkStatsAchievements(userStats: updatedStats)
+            }
 
             // 保存游戏历史
             await StatisticsService.shared.saveGameHistory(

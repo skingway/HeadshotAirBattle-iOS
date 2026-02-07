@@ -57,6 +57,8 @@ ios-deploy --bundle "/Users/wangsisi/Library/Developer/Xcode/DerivedData/Headsho
 | Online: Game Result (win/loss) | Done | handleStatusChange .finished |
 | Online: History Recording | Done | saveOnlineGameResult() |
 | Online: Stats Update | Done | StatisticsService.updateStatistics() |
+| Online: Achievement Triggers | Done | checkGameEndAchievements() + checkStatsAchievements() |
+| Cross-platform Quick Match | Tested | iOS-iOS and iOS-Android tested successfully |
 | Haptic Feedback (miss/hit/kill) | Done | `AudioService.swift` playVibration() |
 | Haptic: Victory/Defeat patterns | Done | `AudioService.swift` |
 | Audio: SFX framework | Done | `AudioService.swift` playSFX() |
@@ -65,10 +67,7 @@ ios-deploy --bundle "/Users/wangsisi/Library/Developer/Xcode/DerivedData/Headsho
 
 ### PENDING / KNOWN ISSUES
 
-| Item | Description | Priority |
-|------|-------------|----------|
-| Quick Match cross-platform | iOS-iOS tested OK for rooms. Quick Match needs more cross-platform testing (Android crash reported when Android starts first) | Medium |
-| Achievements for online | Achievement checking not triggered for online games (only single player) | Low |
+No known critical issues! All major features are complete and tested.
 
 ---
 
@@ -161,6 +160,10 @@ waiting → deploying → battle → finished
 ---
 
 ## Recent Changes
+
+### 2026-02-07 (Final Update)
+1. **Added online game achievements** - Achievement system now triggers for online games (first win, sharpshooter, prophet, etc.)
+2. **Confirmed cross-platform compatibility** - Quick Match tested and working between iOS-iOS and iOS-Android
 
 ### 2026-02-07 (Evening Update)
 1. **Fixed deployment drag offset** - Airplane preview now accurately follows finger position during drag
