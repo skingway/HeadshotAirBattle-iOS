@@ -1,6 +1,6 @@
 # HeadshotAirBattle iOS - Project Status
 
-## Last Updated: 2026-02-06
+## Last Updated: 2026-02-07
 
 ## Project Overview
 iOS native (Swift/SwiftUI) version of HeadshotAirBattle, a battleship-style airplane combat game.
@@ -67,11 +67,9 @@ ios-deploy --bundle "/Users/wangsisi/Library/Developer/Xcode/DerivedData/Headsho
 
 | Item | Description | Priority |
 |------|-------------|----------|
-| Audio files missing | Need 6 mp3 files in `Resources/Sounds/`: `miss.mp3`, `hit.mp3`, `kill.mp3`, `victory.mp3`, `defeat.mp3`, `bgm.mp3` | High |
 | Quick Match cross-platform | iOS-iOS tested OK for rooms. Quick Match needs more cross-platform testing (Android crash reported when Android starts first) | Medium |
 | Online: Battle Report | Android has a detailed BattleReportScreen after online games; iOS shows basic game over | Low |
 | Orientation support | iOS auto-adapts via SwiftUI but may need polish for landscape in online battle | Low |
-| Debug info in UI | RoomLobbyView and OnlineGameView have DEBUG panels visible; should hide for production | Low |
 | Achievements for online | Achievement checking not triggered for online games (only single player) | Low |
 
 ---
@@ -164,7 +162,17 @@ waiting → deploying → battle → finished
 
 ---
 
-## Recent Changes (2026-02-06)
+## Recent Changes
+
+### 2026-02-07
+1. **Fixed online battle airplane display** - Player's deployed airplanes now show consistent detailed shapes in battle view
+2. **Fixed Data Analyst achievement** - Achievement now unlocks when viewing battle reports
+3. **Improved skin/theme unlock display** - Shows detailed progress like "Need 3 more games" instead of generic text
+4. **Added surrender to AI battles** - All AI game modes now have surrender button
+5. **Optimized large board performance** - Improved rendering performance for 15x15 and 20x20 boards
+6. **Hidden debug panels** - DEBUG info now only visible in debug builds, not production
+
+### 2026-02-06
 
 1. **Fixed online Ready flow** - Both players must click Ready before deployment
 2. **Fixed currentTurn** - Uses userId instead of role (matches Android)
