@@ -132,6 +132,10 @@ struct BattleReportView: View {
         }
         .navigationTitle("Battle Report")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            // Unlock "Data Analyst" achievement when viewing battle report
+            AchievementService.shared.manuallyUnlock("analyst")
+        }
     }
 
     private func formatDate(_ timestamp: Double) -> String {

@@ -97,7 +97,8 @@ struct OnlineGameView: View {
                                 }
                             }
 
-                            // 调试信息
+                            #if DEBUG
+                            // 调试信息（仅在调试模式显示）
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("DEBUG:")
                                     .font(.caption.bold())
@@ -112,6 +113,7 @@ struct OnlineGameView: View {
                             .padding(8)
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(8)
+                            #endif
                         }
                     }
 

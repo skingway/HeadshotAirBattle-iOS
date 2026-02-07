@@ -23,10 +23,12 @@ struct SkinsView: View {
                             GridItem(.flexible())
                         ], spacing: 12) {
                             ForEach(SkinDefinitions.airplaneSkins, id: \.id) { skin in
+                                let totalGames = appViewModel.userProfile?.totalGames ?? 0
                                 SkinCard(
                                     skin: skin,
                                     isSelected: viewModel.currentSkinId == skin.id,
-                                    isUnlocked: viewModel.isSkinUnlocked(skin, totalGames: appViewModel.userProfile?.totalGames ?? 0)
+                                    isUnlocked: viewModel.isSkinUnlocked(skin, totalGames: totalGames),
+                                    progressText: viewModel.skinUnlockProgress(skin, totalGames: totalGames)
                                 ) {
                                     viewModel.selectSkin(skin.id)
                                 }
@@ -45,10 +47,12 @@ struct SkinsView: View {
                             GridItem(.flexible())
                         ], spacing: 12) {
                             ForEach(SkinDefinitions.boardThemes, id: \.id) { theme in
+                                let totalWins = appViewModel.userProfile?.wins ?? 0
                                 ThemeCard(
                                     theme: theme,
                                     isSelected: viewModel.currentThemeId == theme.id,
-                                    isUnlocked: viewModel.isThemeUnlocked(theme, totalWins: appViewModel.userProfile?.wins ?? 0)
+                                    isUnlocked: viewModel.isThemeUnlocked(theme, totalWins: totalWins),
+                                    progressText: viewModel.themeUnlockProgress(theme, totalWins: totalWins)
                                 ) {
                                     viewModel.selectTheme(theme.id)
                                 }
@@ -69,6 +73,7 @@ struct SkinCard: View {
     let skin: AirplaneSkinDef
     let isSelected: Bool
     let isUnlocked: Bool
+    let progressText: String
     let onSelect: () -> Void
 
     var body: some View {
@@ -87,7 +92,7 @@ struct SkinCard: View {
                     .lineLimit(1)
 
                 if !isUnlocked {
-                    Text(skin.unlockText)
+                    Text(progressText)
                         .font(.caption2)
                         .foregroundColor(.orange)
                         .lineLimit(1)
@@ -105,6 +110,7 @@ struct ThemeCard: View {
     let theme: BoardThemeDef
     let isSelected: Bool
     let isUnlocked: Bool
+    let progressText: String
     let onSelect: () -> Void
 
     var body: some View {
@@ -123,7 +129,7 @@ struct ThemeCard: View {
                     .foregroundColor(isUnlocked ? .white : .gray)
 
                 if !isUnlocked {
-                    Text(theme.unlockText)
+                    Text(progressText)
                         .font(.caption2)
                         .foregroundColor(.orange)
                 }

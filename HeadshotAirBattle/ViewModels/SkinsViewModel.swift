@@ -27,4 +27,20 @@ class SkinsViewModel: ObservableObject {
     func isThemeUnlocked(_ theme: BoardThemeDef, totalWins: Int) -> Bool {
         return totalWins >= theme.unlockRequirement
     }
+
+    func skinUnlockProgress(_ skin: AirplaneSkinDef, totalGames: Int) -> String {
+        if totalGames >= skin.unlockRequirement {
+            return "Unlocked"
+        }
+        let remaining = skin.unlockRequirement - totalGames
+        return "Need \(remaining) more game\(remaining == 1 ? "" : "s")"
+    }
+
+    func themeUnlockProgress(_ theme: BoardThemeDef, totalWins: Int) -> String {
+        if totalWins >= theme.unlockRequirement {
+            return "Unlocked"
+        }
+        let remaining = theme.unlockRequirement - totalWins
+        return "Need \(remaining) more win\(remaining == 1 ? "" : "s")"
+    }
 }

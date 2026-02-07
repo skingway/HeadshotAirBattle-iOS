@@ -34,10 +34,20 @@ class AudioService {
 
     // MARK: - Preload
 
+    /// Find audio file in bundle, supporting multiple formats
+    private func findAudioURL(named name: String) -> URL? {
+        for ext in ["mp3", "wav", "m4a", "caf", "aac"] {
+            if let url = Bundle.main.url(forResource: name, withExtension: ext) {
+                return url
+            }
+        }
+        return nil
+    }
+
     private func preloadSounds() {
         let soundNames = ["miss", "hit", "kill", "victory", "defeat"]
         for name in soundNames {
-            if let url = Bundle.main.url(forResource: name, withExtension: "mp3") {
+            if let url = findAudioURL(named: name) {
                 sfxPlayers[name] = try? AVAudioPlayer(contentsOf: url)
                 sfxPlayers[name]?.prepareToPlay()
             }
@@ -116,7 +126,7 @@ class AudioService {
         guard isEnabled else { return }
 
         if bgmPlayer == nil {
-            if let url = Bundle.main.url(forResource: "bgm", withExtension: "mp3") {
+            if let url = findAudioURL(named: "bgm") {
                 bgmPlayer = try? AVAudioPlayer(contentsOf: url)
                 bgmPlayer?.numberOfLoops = -1 // Loop indefinitely
             }

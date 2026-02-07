@@ -110,6 +110,11 @@ struct OnlineBoardGridView: View {
     private let labelOffsetX: CGFloat = 20
     private let labelOffsetY: CGFloat = 14
 
+    // Cache board size to reduce recalculation
+    private var boardId: String {
+        "\(isOpponentBoard)-\(boardSize)"
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Column labels
@@ -140,6 +145,7 @@ struct OnlineBoardGridView: View {
                             cellSize: cellSize,
                             themeColors: themeColors
                         )
+                        .id("\(row)-\(col)-\(boardId)")
                         .contentShape(Rectangle())
                         .onTapGesture {
                             if isInteractive && isOpponentBoard {
@@ -150,12 +156,13 @@ struct OnlineBoardGridView: View {
                 }
             }
         }
+        .drawingGroup() // Performance optimization for large grids
     }
 }
 
 /// Single cell view for online battles
 struct OnlineCellView: View {
-    @ObservedObject var viewModel: OnlineGameViewModel
+    let viewModel: OnlineGameViewModel
     let row: Int
     let col: Int
     let isOpponentBoard: Bool
@@ -185,7 +192,7 @@ struct OnlineCellView: View {
                 if let board = viewModel.deploymentHelper.playerBoard,
                    let airplane = board.getAirplaneAt(row: row, col: col),
                    let cellType = airplane.getCellType(row: row, col: col) {
-                    AirplaneCellView(type: cellType, cellSize: cellSize, showDetailed: false)
+                    AirplaneCellView(type: cellType, cellSize: cellSize, showDetailed: true)
                 }
             }
 

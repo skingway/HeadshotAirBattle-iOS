@@ -25,6 +25,19 @@ struct DualBoardView: View {
 
                 // Timer
                 TurnTimerView(timeRemaining: viewModel.turnTimeRemaining)
+
+                // Surrender button
+                Button(action: {
+                    viewModel.surrender()
+                }) {
+                    Text("Surrender")
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.red.opacity(0.8))
+                        .cornerRadius(8)
+                }
             }
             .padding(.horizontal)
 

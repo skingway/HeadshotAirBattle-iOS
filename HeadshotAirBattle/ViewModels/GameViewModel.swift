@@ -112,6 +112,8 @@ class GameViewModel: ObservableObject {
         phase = .battle
         isPlayerTurn = true
         startTurnTimer()
+        // 播放背景音乐
+        AudioService.shared.playBGM()
     }
 
     func playerAttack(row: Int, col: Int) {
@@ -221,6 +223,11 @@ class GameViewModel: ObservableObject {
 
     // MARK: - Game End
 
+    func surrender() {
+        guard phase == .battle else { return }
+        endGame(playerWon: false)
+    }
+
     private func endGame(playerWon: Bool) {
         stopTurnTimer()
         phase = .gameOver
@@ -228,6 +235,14 @@ class GameViewModel: ObservableObject {
 
         playerStats = opponentBoard?.getStatistics() // Player's attacks on opponent board
         aiStats = playerBoard?.getStatistics()       // AI's attacks on player board
+
+        // 停止背景音乐，播放胜负音效
+        AudioService.shared.stopBGM()
+        if playerWon {
+            AudioService.shared.playVictory()
+        } else {
+            AudioService.shared.playDefeat()
+        }
 
         // Save stats
         Task {
