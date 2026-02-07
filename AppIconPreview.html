@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeadshotAirBattle - App Icon Preview & Export</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c 0%, #2563eb 50%, #06b6d4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a2a6c;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .preview-section {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .preview-box {
+            text-align: center;
+        }
+
+        .preview-box h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .icon-preview {
+            background: #f5f5f5;
+            border-radius: 20px;
+            padding: 20px;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .icon-preview img {
+            display: block;
+            border-radius: 22.5%;
+        }
+
+        .size-512 { width: 256px; height: 256px; }
+        .size-180 { width: 180px; height: 180px; border-radius: 40px; }
+        .size-120 { width: 120px; height: 120px; border-radius: 27px; }
+        .size-80 { width: 80px; height: 80px; border-radius: 18px; }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37,99,235,0.4);
+        }
+
+        .btn-secondary {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16,185,129,0.4);
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border: 2px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            color: #1e40af;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .info-box ul {
+            list-style: none;
+            color: #1e40af;
+        }
+
+        .info-box li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .info-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .spec-item {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .spec-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .spec-value {
+            font-size: 16px;
+            color: #1a2a6c;
+            font-weight: 600;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛩️ HeadshotAirBattle App Icon</h1>
+        <p class="subtitle">App Store Ready • 1024x1024 PNG</p>
+
+        <div class="preview-section">
+            <div class="preview-box">
+                <h3>App Store Size</h3>
+                <div class="icon-preview">
+                    <img src="AppIcon.svg" alt="App Icon" class="size-512" id="preview-large">
+                </div>
+            </div>
+
+            <div>
+                <div class="preview-box" style="margin-bottom: 20px;">
+                    <h3>iPhone Home Screen</h3>
+                    <div class="icon-preview">
+                        <img src="AppIcon.svg" alt="App Icon" class="size-180" id="preview-medium">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <div class="preview-box">
+                        <h3>Settings</h3>
+                        <div class="icon-preview">
+                            <img src="AppIcon.svg" alt="App Icon" class="size-120" id="preview-small">
+                        </div>
+                    </div>
+
+                    <div class="preview-box">
+                        <h3>Notification</h3>
+                        <div class="icon-preview">
+                            <img src="AppIcon.svg" alt="App Icon" class="size-80" id="preview-tiny">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="downloadPNG()">
+                📥 Download PNG (1024x1024)
+            </button>
+            <button class="btn btn-secondary" onclick="downloadSVG()">
+                📄 Download SVG Source
+            </button>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            ✓ Downloaded successfully! Ready for App Store submission.
+        </div>
+
+        <div class="specs">
+            <div class="spec-item">
+                <div class="spec-label">Format</div>
+                <div class="spec-value">PNG-24</div>
+            </div>
+            <div class="spec-item">
+                <div class="spec-label">Dimensions</div>
+                <div class="spec-value">1024 × 1024</div>
+            </div>
+            <div class="spec-item">
+                <div class="spec-label">Color Space</div>
+                <div class="spec-value">sRGB</div>
+            </div>
+            <div class="spec-item">
+                <div class="spec-label">Corner Radius</div>
+                <div class="spec-value">22.5%</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>📋 App Store Requirements</h3>
+            <ul>
+                <li>Size: 1024x1024 pixels (exactly)</li>
+                <li>Format: PNG or JPEG (PNG recommended)</li>
+                <li>Color space: sRGB or Display P3</li>
+                <li>No transparency or alpha channel</li>
+                <li>No rounded corners (iOS adds them automatically)</li>
+            </ul>
+        </div>
+
+        <div class="info-box" style="margin-top: 15px; background: #fef3c7; border-color: #fcd34d;">
+            <h3 style="color: #92400e;">🎨 Design Features</h3>
+            <ul style="color: #92400e;">
+                <li>Blue-cyan gradient background (military aviation theme)</li>
+                <li>Golden-yellow airplane silhouette (high visibility)</li>
+                <li>Grid pattern overlay (tactical board reference)</li>
+                <li>Target rings and crosshairs (combat focus)</li>
+                <li>Green corner reticles (precision aiming)</li>
+            </ul>
+        </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // Download PNG function
+        async function downloadPNG() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas to App Store required size
+            canvas.width = 1024;
+            canvas.height = 1024;
+
+            // Load SVG
+            const img = new Image();
+            const svgBlob = await fetch('AppIcon.svg').then(r => r.blob());
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function() {
+                // Draw SVG to canvas
+                ctx.drawImage(img, 0, 0, 1024, 1024);
+
+                // Convert to PNG and download
+                canvas.toBlob(function(blob) {
+                    const link = document.createElement('a');
+                    link.download = 'HeadshotAirBattle-AppIcon-1024x1024.png';
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+
+                    // Show success message
+                    showSuccess();
+                }, 'image/png', 1.0);
+
+                URL.revokeObjectURL(url);
+            };
+
+            img.src = url;
+        }
+
+        // Download SVG function
+        function downloadSVG() {
+            fetch('AppIcon.svg')
+                .then(response => response.blob())
+                .then(blob => {
+                    const link = document.createElement('a');
+                    link.download = 'HeadshotAirBattle-AppIcon.svg';
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+                    showSuccess();
+                });
+        }
+
+        // Show success message
+        function showSuccess() {
+            const message = document.getElementById('successMessage');
+            message.style.display = 'block';
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
