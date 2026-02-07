@@ -295,52 +295,177 @@
     <canvas id="canvas"></canvas>
 
     <script>
-        // Download PNG function
+        // Download PNG function with comprehensive error handling
         async function downloadPNG() {
-            const canvas = document.getElementById('canvas');
-            const ctx = canvas.getContext('2d');
+            console.log('Starting PNG download...');
 
-            // Set canvas to App Store required size
-            canvas.width = 1024;
-            canvas.height = 1024;
+            try {
+                const canvas = document.getElementById('canvas');
+                const ctx = canvas.getContext('2d');
 
-            // Load SVG
-            const img = new Image();
-            const svgBlob = await fetch('AppIcon.svg').then(r => r.blob());
-            const url = URL.createObjectURL(svgBlob);
+                // Set canvas to App Store required size
+                canvas.width = 1024;
+                canvas.height = 1024;
 
-            img.onload = function() {
-                // Draw SVG to canvas
-                ctx.drawImage(img, 0, 0, 1024, 1024);
+                // Load SVG with error handling
+                console.log('Fetching AppIcon.svg...');
+                let svgBlob;
+                try {
+                    const response = await fetch('AppIcon.svg');
+                    if (!response.ok) {
+                        throw new Error(`Failed to load AppIcon.svg: ${response.status} ${response.statusText}`);
+                    }
+                    svgBlob = await response.blob();
+                    console.log('SVG fetched successfully');
+                } catch (fetchError) {
+                    console.error('Fetch error:', fetchError);
 
-                // Convert to PNG and download
-                canvas.toBlob(function(blob) {
-                    const link = document.createElement('a');
-                    link.download = 'HeadshotAirBattle-AppIcon-1024x1024.png';
-                    link.href = URL.createObjectURL(blob);
-                    link.click();
+                    // Check if we're using file:// protocol (CORS issue)
+                    if (window.location.protocol === 'file:') {
+                        alert('⚠️ Cannot download when opened directly from file system.\n\n' +
+                              'Please use a local web server:\n' +
+                              '1. Open Terminal\n' +
+                              '2. Navigate to this directory\n' +
+                              '3. Run: python3 -m http.server 8000\n' +
+                              '4. Open: http://localhost:8000/AppIconPreview.html\n\n' +
+                              'Or drag AppIcon.svg into your browser to save it manually.');
+                    } else {
+                        alert('❌ Error loading AppIcon.svg\n\n' +
+                              'Please ensure AppIcon.svg is in the same directory as this HTML file.\n\n' +
+                              'Error: ' + fetchError.message);
+                    }
+                    return;
+                }
 
-                    // Show success message
-                    showSuccess();
-                }, 'image/png', 1.0);
+                const url = URL.createObjectURL(svgBlob);
+                const img = new Image();
 
+                // Create a promise for image loading
+                const imageLoadPromise = new Promise((resolve, reject) => {
+                    img.onload = function() {
+                        console.log('Image loaded successfully');
+                        try {
+                            // Draw SVG to canvas
+                            ctx.drawImage(img, 0, 0, 1024, 1024);
+                            console.log('Image drawn to canvas');
+                            resolve();
+                        } catch (drawError) {
+                            console.error('Canvas draw error:', drawError);
+                            reject(drawError);
+                        }
+                    };
+
+                    img.onerror = function(error) {
+                        console.error('Image loading failed:', error);
+                        reject(new Error('Failed to load image from blob'));
+                    };
+
+                    // Set timeout for image loading
+                    setTimeout(() => {
+                        reject(new Error('Image loading timed out after 10 seconds'));
+                    }, 10000);
+                });
+
+                // Start loading the image
+                img.src = url;
+
+                // Wait for image to load
+                await imageLoadPromise;
+
+                // Convert to PNG and download with validation
+                console.log('Converting to PNG...');
+                const blobPromise = new Promise((resolve, reject) => {
+                    canvas.toBlob(function(blob) {
+                        if (!blob) {
+                            console.error('Failed to create PNG blob');
+                            reject(new Error('Failed to create PNG blob'));
+                            return;
+                        }
+
+                        console.log(`PNG blob created: ${blob.size} bytes`);
+
+                        // Validate blob size (should be reasonable for 1024x1024 PNG)
+                        if (blob.size < 1000) {
+                            console.error('PNG blob suspiciously small:', blob.size);
+                            reject(new Error('Generated PNG appears to be invalid (too small)'));
+                            return;
+                        }
+
+                        resolve(blob);
+                    }, 'image/png', 1.0);
+                });
+
+                const pngBlob = await blobPromise;
+
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'HeadshotAirBattle-AppIcon-1024x1024.png';
+                link.href = URL.createObjectURL(pngBlob);
+                link.click();
+
+                // Cleanup
                 URL.revokeObjectURL(url);
-            };
+                URL.revokeObjectURL(link.href);
 
-            img.src = url;
+                // Show success message
+                console.log('PNG download completed successfully');
+                showSuccess();
+
+            } catch (error) {
+                console.error('PNG download failed:', error);
+                alert('❌ Failed to generate PNG\n\n' +
+                      'Error: ' + error.message + '\n\n' +
+                      'Please check the browser console for more details.');
+            }
         }
 
-        // Download SVG function
-        function downloadSVG() {
-            fetch('AppIcon.svg')
-                .then(response => response.blob())
-                .then(blob => {
-                    const link = document.createElement('a');
-                    link.download = 'HeadshotAirBattle-AppIcon.svg';
-                    link.href = URL.createObjectURL(blob);
-                    link.click();
-                    showSuccess();
-                });
+        // Download SVG function with error handling
+        async function downloadSVG() {
+            console.log('Starting SVG download...');
+
+            try {
+                const response = await fetch('AppIcon.svg');
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load AppIcon.svg: ${response.status} ${response.statusText}`);
+                }
+
+                const blob = await response.blob();
+                console.log(`SVG blob created: ${blob.size} bytes`);
+
+                // Validate blob
+                if (blob.size < 100) {
+                    throw new Error('SVG file appears to be invalid (too small)');
+                }
+
+                const link = document.createElement('a');
+                link.download = 'HeadshotAirBattle-AppIcon.svg';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+
+                // Cleanup
+                URL.revokeObjectURL(link.href);
+
+                console.log('SVG download completed successfully');
+                showSuccess();
+
+            } catch (error) {
+                console.error('SVG download failed:', error);
+
+                // Check if we're using file:// protocol
+                if (window.location.protocol === 'file:') {
+                    alert('⚠️ Cannot download when opened directly from file system.\n\n' +
+                          'Please use a local web server:\n' +
+                          '1. Open Terminal\n' +
+                          '2. Navigate to this directory\n' +
+                          '3. Run: python3 -m http.server 8000\n' +
+                          '4. Open: http://localhost:8000/AppIconPreview.html');
+                } else {
+                    alert('❌ Failed to download SVG\n\n' +
+                          'Error: ' + error.message + '\n\n' +
+                          'Please ensure AppIcon.svg exists in the same directory.');
+                }
+            }
         }
 
         // Show success message

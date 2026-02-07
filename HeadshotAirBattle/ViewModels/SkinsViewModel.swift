@@ -21,26 +21,34 @@ class SkinsViewModel: ObservableObject {
     }
 
     func isSkinUnlocked(_ skin: AirplaneSkinDef, totalGames: Int) -> Bool {
-        return totalGames >= skin.unlockRequirement
+        return SkinService.shared.isSkinUnlocked(skin, totalGames: totalGames)
     }
 
     func isThemeUnlocked(_ theme: BoardThemeDef, totalWins: Int) -> Bool {
-        return totalWins >= theme.unlockRequirement
+        return SkinService.shared.isThemeUnlocked(theme, wins: totalWins)
     }
 
     func skinUnlockProgress(_ skin: AirplaneSkinDef, totalGames: Int) -> String {
-        if totalGames >= skin.unlockRequirement {
+        if isSkinUnlocked(skin, totalGames: totalGames) {
             return "Unlocked"
         }
+        // Premium skins require IAP
+        if skin.unlockRequirement < 0 {
+            return skin.unlockText
+        }
         let remaining = skin.unlockRequirement - totalGames
-        return "Need \(remaining) more game\(remaining == 1 ? "" : "s")"
+        return "Need \(remaining) more game\(remaining == 1 ? "" : "s") or Premium Skin Pack"
     }
 
     func themeUnlockProgress(_ theme: BoardThemeDef, totalWins: Int) -> String {
-        if totalWins >= theme.unlockRequirement {
+        if isThemeUnlocked(theme, totalWins: totalWins) {
             return "Unlocked"
         }
+        // Premium themes require IAP
+        if theme.unlockRequirement < 0 {
+            return theme.unlockText
+        }
         let remaining = theme.unlockRequirement - totalWins
-        return "Need \(remaining) more win\(remaining == 1 ? "" : "s")"
+        return "Need \(remaining) more win\(remaining == 1 ? "" : "s") or Premium Theme Pack"
     }
 }

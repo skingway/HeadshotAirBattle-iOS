@@ -225,6 +225,9 @@ enum GameConstants {
         static let achievementsData = "achievements_data"
         static let airplaneSkin = "@airplane_skin"
         static let boardTheme = "@board_theme"
+        static let iapPurchases = "@iap_purchases"
+        static let gamesPlayedSinceAd = "@games_since_ad"
+        static let lastInterstitialTime = "@last_interstitial_time"
     }
 
     // MARK: - Animation Durations

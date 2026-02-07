@@ -11,6 +11,8 @@ class SettingsViewModel: ObservableObject {
     @Published var sfxVolume: Float {
         didSet { UserDefaults.standard.set(sfxVolume, forKey: GameConstants.StorageKeys.sfxVolume) }
     }
+    @Published var showSignOutConfirm = false
+    @Published var showDeleteConfirm = false
 
     init() {
         let defaults = UserDefaults.standard

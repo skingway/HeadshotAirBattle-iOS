@@ -14,6 +14,9 @@ packages:
   Firebase:
     url: https://github.com/firebase/firebase-ios-sdk
     exactVersion: 11.6.0
+  GoogleMobileAds:
+    url: https://github.com/googleads/swift-package-manager-google-mobile-ads
+    exactVersion: 11.13.0
 
 targets:
   HeadshotAirBattle:
@@ -29,9 +32,8 @@ targets:
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"
         DEVELOPMENT_TEAM: 8J6A847P66
-        CODE_SIGN_STYLE: Manual
-        CODE_SIGN_IDENTITY: "Apple Development"
-        PROVISIONING_PROFILE_SPECIFIER: "com.headshotairbattle Development"
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: HeadshotAirBattle/HeadshotAirBattle.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
         SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: YES
@@ -42,6 +44,8 @@ targets:
         product: FirebaseFirestore
       - package: Firebase
         product: FirebaseDatabase
+      - package: GoogleMobileAds
+        product: GoogleMobileAds
 
   HeadshotAirBattleTests:
     type: bundle.unit-test

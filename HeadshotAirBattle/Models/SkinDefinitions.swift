@@ -55,6 +55,15 @@ enum SkinDefinitions {
                         unlockRequirement: 70, unlockText: "Win 30 games", color: "#8bc34a"),
         AirplaneSkinDef(id: "rose", name: "Rose Gold", description: "Elegant rose gold",
                         unlockRequirement: 100, unlockText: "Win 50 games", color: "#ff6b9d"),
+        // Premium skins (IAP only)
+        AirplaneSkinDef(id: "diamond", name: "Diamond", description: "Brilliant diamond sparkle",
+                        unlockRequirement: -1, unlockText: "Premium Skin Pack", color: "#b9f2ff"),
+        AirplaneSkinDef(id: "stealth", name: "Stealth", description: "Invisible stealth fighter",
+                        unlockRequirement: -1, unlockText: "Premium Skin Pack", color: "#2d2d2d"),
+        AirplaneSkinDef(id: "flame", name: "Flame", description: "Blazing inferno wings",
+                        unlockRequirement: -1, unlockText: "Premium Skin Pack", color: "#ff4500"),
+        AirplaneSkinDef(id: "aurora", name: "Aurora", description: "Northern lights shimmer",
+                        unlockRequirement: -1, unlockText: "Premium Skin Pack", color: "#00ff88"),
     ]
 
     static let boardThemes: [BoardThemeDef] = [
@@ -94,6 +103,19 @@ enum SkinDefinitions {
                       unlockRequirement: 200, unlockText: "Win 200 games",
                       colors: ThemeColors(cellEmpty: "#1a0a2e", cellAirplane: "#6a0dad", cellHit: "#ff1493",
                                          cellMiss: "#483d8b", cellKilled: "#ff0066", gridLine: "#2e1a47", background: "#0a0118")),
+        // Premium themes (IAP only)
+        BoardThemeDef(id: "neon_city", name: "Neon City", description: "Cyberpunk neon lights", icon: "🏙️",
+                      unlockRequirement: -1, unlockText: "Premium Theme Pack",
+                      colors: ThemeColors(cellEmpty: "#0a0020", cellAirplane: "#ff00ff", cellHit: "#00ffff",
+                                         cellMiss: "#1a0040", cellKilled: "#ff0080", gridLine: "#2a0060", background: "#050010")),
+        BoardThemeDef(id: "cherry_blossom", name: "Cherry Blossom", description: "Japanese spring garden", icon: "🌸",
+                      unlockRequirement: -1, unlockText: "Premium Theme Pack",
+                      colors: ThemeColors(cellEmpty: "#2a1520", cellAirplane: "#ff69b4", cellHit: "#ff1744",
+                                         cellMiss: "#8b4563", cellKilled: "#d50032", gridLine: "#3d2030", background: "#1a0a10")),
+        BoardThemeDef(id: "midnight_gold", name: "Midnight Gold", description: "Luxurious midnight elegance", icon: "✨",
+                      unlockRequirement: -1, unlockText: "Premium Theme Pack",
+                      colors: ThemeColors(cellEmpty: "#1a1400", cellAirplane: "#ffd700", cellHit: "#ff4444",
+                                         cellMiss: "#665500", cellKilled: "#cc0000", gridLine: "#332a00", background: "#0d0a00")),
     ]
 
     static func getSkin(_ id: String) -> AirplaneSkinDef? {

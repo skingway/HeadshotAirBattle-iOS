@@ -13,6 +13,10 @@ struct UserProfile: Codable {
     var losses: Int
     var winRate: Double
     var onlineGames: Int?
+    var authProvider: String  // "anonymous", "apple"
+    var appleDisplayName: String?
+    var appleEmail: String?
+    var linkedAt: Double?
 
     init(userId: String, nickname: String) {
         self.userId = userId
@@ -25,6 +29,10 @@ struct UserProfile: Codable {
         self.losses = 0
         self.winRate = 0
         self.onlineGames = nil
+        self.authProvider = "anonymous"
+        self.appleDisplayName = nil
+        self.appleEmail = nil
+        self.linkedAt = nil
     }
 }
 

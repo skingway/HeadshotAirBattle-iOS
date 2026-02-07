@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		08BFEDDC7627BC0F038722E0 /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501BF27315255EF7FAC071EF /* LeaderboardView.swift */; };
+		0948DDDEAE18BF465687CBD3 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 531477DD4C0231FEC0810021 /* GoogleMobileAds */; };
 		09737240FA41FE14EA1C6C78 /* DualBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A083CBD63A53A7A658A2AB8B /* DualBoardView.swift */; };
 		0C3C4779DCE908789474E525 /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4FB1EBB75BCEF4CBC2E4F31 /* MainMenuView.swift */; };
 		0C8013F4DDC7F5AE1015D956 /* GameHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DBBA66A25E45A69355FA79 /* GameHistoryViewModel.swift */; };
@@ -16,13 +17,18 @@
 		17E4E18FCC54EAE69DFFB84A /* AIStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9D49597A2B3ACD1383905F /* AIStrategy.swift */; };
 		1EF7316C50430B4848E0A38C /* AchievementDefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F3D08197521927F4FDC905D /* AchievementDefinitions.swift */; };
 		20E6368E9F42B31341BBAD1A /* AchievementsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2E5624B80AD2B9A5C808D /* AchievementsViewModel.swift */; };
+		238E191E9A1E24E6D23202D7 /* IAPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947D079E3F2675B20CDDEABC /* IAPService.swift */; };
 		23DCF63DEA0E035D0EF3D53D /* AchievementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42690108D1AAB4A97DE40FAB /* AchievementsView.swift */; };
 		251DFE0487FB1D6EF2E9982D /* FirebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C183F07FC2FE98ACB00CB31 /* FirebaseService.swift */; };
 		269F5D879C0D4F77BF1F3419 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDD10FC52CFC823ABBADB0DD /* ProfileView.swift */; };
 		26A5237AE9A21DA2057A5970 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 1B23FEFB438A766E699E80E5 /* FirebaseFirestore */; };
 		2D450C1C4FE874C8FEF31E8B /* miss.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D0894DC6F4F80F379B79F98A /* miss.mp3 */; };
+		31ACEB6B579E847D436ACC2F /* IAPConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57EEB86754C22082955D695F /* IAPConfig.swift */; };
+		3EABBD13AF61664D3E76CB0A /* AppleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1232639E20B7D6B1A4FDC7C9 /* AppleSignInService.swift */; };
 		3F2A7E4F2042F4A2E906BEF4 /* RoomLobbyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25DBE4670843A8C107E3465 /* RoomLobbyView.swift */; };
+		4166EF193155DF0A22D11C4E /* victory.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0863C1E4CD4248ACBD968C79 /* victory.mp3 */; };
 		4B3BD206C98DC965F3623131 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED416E327E6E599348747F9 /* AudioService.swift */; };
+		4E10144DF5A2354EA7C5D635 /* AdConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52D1F4102F60C10828B7F08 /* AdConfig.swift */; };
 		52BFCD4B916C6A999323909B /* AirplaneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A908252BA7351F702AF8EE6 /* AirplaneTests.swift */; };
 		554D33374A6BB408672C62E8 /* CustomModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E7ABBB0ED8791B00545361 /* CustomModeView.swift */; };
 		599CC5612F1E68AD1F887B47 /* CoordinateSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCF2C4E0D008CDC5710F7B9 /* CoordinateSystem.swift */; };
@@ -32,10 +38,11 @@
 		6D3135B201874EEE748FDF6C /* HeadshotAirBattleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BC5767406DAC7CBC797FDC /* HeadshotAirBattleApp.swift */; };
 		6DD4AFC550B2819C9FAAF410 /* BattleReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82F666576654FFB67C7343B9 /* BattleReportView.swift */; };
 		6ECDE53056F0F640D020236A /* SkinService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E63D7C42CE7ACDCDD3873AA /* SkinService.swift */; };
+		6F09003D3D8E10B485A76DF5 /* BannerAdView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9381B7E0A97460D4C8D72146 /* BannerAdView.swift */; };
 		704D31B10D0356E139010341 /* CountdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A36ADF61CF7D6B98A929DEA /* CountdownView.swift */; };
 		75E58B68CA31475A2ED0D46C /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D60213504BE84FB87F1E8F /* GameViewModel.swift */; };
 		75F743821856D9F25D41E14D /* BoardGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7492283D514265549C5E85C8 /* BoardGridView.swift */; };
-		8A338828622C9EBBE81864A1 /* victory.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F282E34DF1E413BEB63A6BC9 /* victory.mp3 */; };
+		8B90A9E0D48F23BBB5B278DE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FA53367E2F35E765CA1077F2 /* PrivacyInfo.xcprivacy */; };
 		8C3195454A5944DF52BF34D6 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E97A5E0AECB807A7404F06E /* Extensions.swift */; };
 		8D782DDFB68B00FD8F6923B3 /* BoardManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B63DF6243004326FB546843 /* BoardManagerTests.swift */; };
 		8E8C9CAB6C1B58EF758BAEF7 /* OnlineBattleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8404FA3AAC5B592741E546 /* OnlineBattleView.swift */; };
@@ -49,11 +56,11 @@
 		A7BE42392DCBBFF7703330E4 /* bgm.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7D349CD671FB34072EDE3268 /* bgm.mp3 */; };
 		A83C58333D4666DFED68C2E9 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2113E2EB0494D0C4AF1A170 /* ProfileViewModel.swift */; };
 		AA44F70665F6FF74B2D079C9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D34B24AC156E3AEDB7CFBFE /* ContentView.swift */; };
-		ABDF4D2E45EC331FAB843495 /* defeat.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DEBFAF3376EA111A70EA65F2 /* defeat.mp3 */; };
 		AC329016BEEAA90606A33136 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26D5AFE9BC0D484E9CD4B20 /* AppViewModel.swift */; };
 		AD0DB12C7F080BEA7A8FB280 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10837E3224A19514E90D408B /* GameState.swift */; };
 		AF1A191CB435BF6DF3C930E8 /* AIStrategyHard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181A119842E8C6105961A1E7 /* AIStrategyHard.swift */; };
 		B1D73DD47C48EF32375B008D /* MultiplayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B105B3B5D34644ACAE778734 /* MultiplayerService.swift */; };
+		B33FC9D94443194D781694CF /* AdService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD5A730390BC599B80D9F196 /* AdService.swift */; };
 		B383F69F372065E7BACB6E81 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0787E7D422400E687685190 /* AuthService.swift */; };
 		B498F76006B3074700AFB5C3 /* OnlineGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 540B3889012A36ABE9A0C45E /* OnlineGameView.swift */; };
 		B6C9906BCAF76048014A7996 /* SinglePlayerSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D93CB8E4BC850F57216A4 /* SinglePlayerSetupView.swift */; };
@@ -70,10 +77,13 @@
 		DD8A36B0BAA1F7E28EEE3F15 /* TurnTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A9B3FA2C2D4A32C9C20E2 /* TurnTimerView.swift */; };
 		DECC292BC0801ECC7BB7C7C2 /* Airplane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD4C7987962B00BB0BEAC34 /* Airplane.swift */; };
 		DF5A58A4936D9F260930FA6D /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8906FEE3FB924515E4F778DF /* SettingsViewModel.swift */; };
+		E065539F5642A053AD144615 /* StoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3AECA00DAF2956F75F16F0F /* StoreView.swift */; };
 		E20A7953534D12DEA80F3E6B /* SkinsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46FB4E16E154C0367A85342 /* SkinsViewModel.swift */; };
+		E3D019B972DCA36D87A0F00A /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CA6F81F35FED97B404534E /* PrivacyPolicyView.swift */; };
 		E499A3A607DB7B10FB56420B /* AchievementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930B351870666143A5A4A557 /* AchievementService.swift */; };
 		E8D4DB8F8392F8CBB1140C67 /* GameHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4FC4E3AE7720104E6FA3182 /* GameHistoryView.swift */; };
 		E9B3E51A2DF3AA788F97B292 /* AIStrategyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8329E34250719CC9B14C12 /* AIStrategyTests.swift */; };
+		ED8380A4A405FE18F7288439 /* defeat.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 01A17DE6BFAD9C5FD5B16D1F /* defeat.mp3 */; };
 		ED98AD430A1039A4F73F44EB /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B6BDCDB0C4DB07F9B30482 /* CellView.swift */; };
 		F08E124DADC9656DAC2991B4 /* OnlineGameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BCD62322CB12120C77CA24 /* OnlineGameViewModel.swift */; };
 		F8AAFC2FBD2D0850F8BB1131 /* DeploymentBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562CA34E621D417D16FAD02E /* DeploymentBoardView.swift */; };
@@ -92,9 +102,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		01A17DE6BFAD9C5FD5B16D1F /* defeat.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = defeat.mp3; sourceTree = "<group>"; };
+		0863C1E4CD4248ACBD968C79 /* victory.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = victory.mp3; sourceTree = "<group>"; };
 		0F3D08197521927F4FDC905D /* AchievementDefinitions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementDefinitions.swift; sourceTree = "<group>"; };
 		10837E3224A19514E90D408B /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+		1232639E20B7D6B1A4FDC7C9 /* AppleSignInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInService.swift; sourceTree = "<group>"; };
 		14D2E5624B80AD2B9A5C808D /* AchievementsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsViewModel.swift; sourceTree = "<group>"; };
+		17CA6F81F35FED97B404534E /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
 		181A119842E8C6105961A1E7 /* AIStrategyHard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIStrategyHard.swift; sourceTree = "<group>"; };
 		1A8329E34250719CC9B14C12 /* AIStrategyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIStrategyTests.swift; sourceTree = "<group>"; };
 		1C4C5601007E3F18E63D6E76 /* StatisticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsService.swift; sourceTree = "<group>"; };
@@ -107,6 +121,7 @@
 		36B6BDCDB0C4DB07F9B30482 /* CellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellView.swift; sourceTree = "<group>"; };
 		3E63D7C42CE7ACDCDD3873AA /* SkinService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinService.swift; sourceTree = "<group>"; };
 		3F59563454061AC857C79FAE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		421FC82715CBCE84D9706C82 /* HeadshotAirBattle.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HeadshotAirBattle.entitlements; sourceTree = "<group>"; };
 		42690108D1AAB4A97DE40FAB /* AchievementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsView.swift; sourceTree = "<group>"; };
 		454B1957EC5B855264CF6C83 /* SkinsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinsView.swift; sourceTree = "<group>"; };
 		48D60213504BE84FB87F1E8F /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
@@ -114,6 +129,7 @@
 		540B3889012A36ABE9A0C45E /* OnlineGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineGameView.swift; sourceTree = "<group>"; };
 		562CA34E621D417D16FAD02E /* DeploymentBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeploymentBoardView.swift; sourceTree = "<group>"; };
 		5731DDC35A64D28FE984D597 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		57EEB86754C22082955D695F /* IAPConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPConfig.swift; sourceTree = "<group>"; };
 		5BEA6EE82C36B953DE7F090D /* RoomLobbyViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomLobbyViewModel.swift; sourceTree = "<group>"; };
 		5D34B24AC156E3AEDB7CFBFE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6ADCE4F3EBD717991E1413A5 /* SkinDefinitions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinDefinitions.swift; sourceTree = "<group>"; };
@@ -129,6 +145,8 @@
 		8906FEE3FB924515E4F778DF /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		8DD4C7987962B00BB0BEAC34 /* Airplane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Airplane.swift; sourceTree = "<group>"; };
 		930B351870666143A5A4A557 /* AchievementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementService.swift; sourceTree = "<group>"; };
+		9381B7E0A97460D4C8D72146 /* BannerAdView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerAdView.swift; sourceTree = "<group>"; };
+		947D079E3F2675B20CDDEABC /* IAPService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPService.swift; sourceTree = "<group>"; };
 		953A9B3FA2C2D4A32C9C20E2 /* TurnTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnTimerView.swift; sourceTree = "<group>"; };
 		A083CBD63A53A7A658A2AB8B /* DualBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualBoardView.swift; sourceTree = "<group>"; };
 		A26D5AFE9BC0D484E9CD4B20 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
@@ -139,6 +157,7 @@
 		B105B3B5D34644ACAE778734 /* MultiplayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiplayerService.swift; sourceTree = "<group>"; };
 		B2A37A7381434D40784278A0 /* BoardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardManager.swift; sourceTree = "<group>"; };
 		B4FC4E3AE7720104E6FA3182 /* GameHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameHistoryView.swift; sourceTree = "<group>"; };
+		B52D1F4102F60C10828B7F08 /* AdConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdConfig.swift; sourceTree = "<group>"; };
 		BE8404FA3AAC5B592741E546 /* OnlineBattleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineBattleView.swift; sourceTree = "<group>"; };
 		BF9FBCCE634E348A8482007D /* HeadshotAirBattle.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = HeadshotAirBattle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0787E7D422400E687685190 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
@@ -156,14 +175,15 @@
 		DA6B32CAC4278FF1C166005D /* MatchmakingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchmakingViewModel.swift; sourceTree = "<group>"; };
 		DC8145532F9F4BF11AE73975 /* MatchmakingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchmakingService.swift; sourceTree = "<group>"; };
 		DCCF2C4E0D008CDC5710F7B9 /* CoordinateSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinateSystem.swift; sourceTree = "<group>"; };
-		DEBFAF3376EA111A70EA65F2 /* defeat.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = defeat.mp3; sourceTree = "<group>"; };
 		E25DBE4670843A8C107E3465 /* RoomLobbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomLobbyView.swift; sourceTree = "<group>"; };
+		E3AECA00DAF2956F75F16F0F /* StoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreView.swift; sourceTree = "<group>"; };
 		E68164DA03AB0ABE1A379088 /* GameLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameLogView.swift; sourceTree = "<group>"; };
 		E8BCD62322CB12120C77CA24 /* OnlineGameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineGameViewModel.swift; sourceTree = "<group>"; };
 		EBD86685E02FDEF10D81931C /* OnlineModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineModeView.swift; sourceTree = "<group>"; };
 		EDD10FC52CFC823ABBADB0DD /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		F25FB798EF3C2C0523CB6B84 /* RoomService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomService.swift; sourceTree = "<group>"; };
-		F282E34DF1E413BEB63A6BC9 /* victory.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = victory.mp3; sourceTree = "<group>"; };
+		FA53367E2F35E765CA1077F2 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		FD5A730390BC599B80D9F196 /* AdService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,6 +194,7 @@
 				B8113550395814D7C9165112 /* FirebaseAuth in Frameworks */,
 				26A5237AE9A21DA2057A5970 /* FirebaseFirestore in Frameworks */,
 				5C180D1F7D04AE730D875580 /* FirebaseDatabase in Frameworks */,
+				0948DDDEAE18BF465687CBD3 /* GoogleMobileAds in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,9 +205,12 @@
 			isa = PBXGroup;
 			children = (
 				930B351870666143A5A4A557 /* AchievementService.swift */,
+				FD5A730390BC599B80D9F196 /* AdService.swift */,
+				1232639E20B7D6B1A4FDC7C9 /* AppleSignInService.swift */,
 				6ED416E327E6E599348747F9 /* AudioService.swift */,
 				C0787E7D422400E687685190 /* AuthService.swift */,
 				2C183F07FC2FE98ACB00CB31 /* FirebaseService.swift */,
+				947D079E3F2675B20CDDEABC /* IAPService.swift */,
 				DC8145532F9F4BF11AE73975 /* MatchmakingService.swift */,
 				B105B3B5D34644ACAE778734 /* MultiplayerService.swift */,
 				F25FB798EF3C2C0523CB6B84 /* RoomService.swift */,
@@ -209,11 +233,11 @@
 			isa = PBXGroup;
 			children = (
 				7D349CD671FB34072EDE3268 /* bgm.mp3 */,
-				DEBFAF3376EA111A70EA65F2 /* defeat.mp3 */,
+				01A17DE6BFAD9C5FD5B16D1F /* defeat.mp3 */,
 				A5DA20655A105FF98D1C241C /* hit.mp3 */,
 				D6FD9554FE452743B4B23793 /* kill.mp3 */,
 				D0894DC6F4F80F379B79F98A /* miss.mp3 */,
-				F282E34DF1E413BEB63A6BC9 /* victory.mp3 */,
+				0863C1E4CD4248ACBD968C79 /* victory.mp3 */,
 			);
 			path = Sounds;
 			sourceTree = "<group>";
@@ -230,8 +254,10 @@
 		3250729887646168F9A06AA3 /* HeadshotAirBattle */ = {
 			isa = PBXGroup;
 			children = (
+				421FC82715CBCE84D9706C82 /* HeadshotAirBattle.entitlements */,
 				18B1E3AB60331E9F2A3FD1FC /* AI */,
 				2DEE0B51EC34D81D9CABAE24 /* App */,
+				C30029EA7DA594D16779BA21 /* Config */,
 				7198E4B47684273F0A7E4965 /* Models */,
 				C7551A5C5D31507AD633802F /* Resources */,
 				0D77C26C05AF0DBA04D4F80C /* Services */,
@@ -288,11 +314,13 @@
 				73D3D3A66A8F23D55F67B668 /* MatchmakingView.swift */,
 				540B3889012A36ABE9A0C45E /* OnlineGameView.swift */,
 				EBD86685E02FDEF10D81931C /* OnlineModeView.swift */,
+				17CA6F81F35FED97B404534E /* PrivacyPolicyView.swift */,
 				EDD10FC52CFC823ABBADB0DD /* ProfileView.swift */,
 				E25DBE4670843A8C107E3465 /* RoomLobbyView.swift */,
 				D00C70CFAF1C0482A97B569E /* SettingsView.swift */,
 				C55D93CB8E4BC850F57216A4 /* SinglePlayerSetupView.swift */,
 				454B1957EC5B855264CF6C83 /* SkinsView.swift */,
+				E3AECA00DAF2956F75F16F0F /* StoreView.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -321,6 +349,7 @@
 			isa = PBXGroup;
 			children = (
 				215227CF8B449D916B94D820 /* AirplaneShapeView.swift */,
+				9381B7E0A97460D4C8D72146 /* BannerAdView.swift */,
 				7492283D514265549C5E85C8 /* BoardGridView.swift */,
 				36B6BDCDB0C4DB07F9B30482 /* CellView.swift */,
 				2A36ADF61CF7D6B98A929DEA /* CountdownView.swift */,
@@ -341,12 +370,22 @@
 			path = Utilities;
 			sourceTree = "<group>";
 		};
+		C30029EA7DA594D16779BA21 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				B52D1F4102F60C10828B7F08 /* AdConfig.swift */,
+				57EEB86754C22082955D695F /* IAPConfig.swift */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
 		C7551A5C5D31507AD633802F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
 				3F59563454061AC857C79FAE /* Assets.xcassets */,
 				D58977D4E0614E9961351939 /* GoogleService-Info.plist */,
 				5731DDC35A64D28FE984D597 /* Info.plist */,
+				FA53367E2F35E765CA1077F2 /* PrivacyInfo.xcprivacy */,
 				1D157C7FD249AC253D0B30A2 /* Sounds */,
 			);
 			path = Resources;
@@ -390,6 +429,7 @@
 				735E77B78D02F16B9EFEFC58 /* FirebaseAuth */,
 				1B23FEFB438A766E699E80E5 /* FirebaseFirestore */,
 				94A3CC7A052A5C21B383BFCD /* FirebaseDatabase */,
+				531477DD4C0231FEC0810021 /* GoogleMobileAds */,
 			);
 			productName = HeadshotAirBattle;
 			productReference = BF9FBCCE634E348A8482007D /* HeadshotAirBattle.app */;
@@ -424,7 +464,7 @@
 				TargetAttributes = {
 					2A1075D63D97CA70F62EA674 = {
 						DevelopmentTeam = 8J6A847P66;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -440,6 +480,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				668FC22631170739F0B95DAF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				C20048AB30E233502CC9BE73 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
@@ -458,12 +499,13 @@
 			files = (
 				BF31F2CBE35CDC2245707026 /* Assets.xcassets in Resources */,
 				D2325A29CBD346C8E19214FD /* GoogleService-Info.plist in Resources */,
+				8B90A9E0D48F23BBB5B278DE /* PrivacyInfo.xcprivacy in Resources */,
 				A7BE42392DCBBFF7703330E4 /* bgm.mp3 in Resources */,
-				ABDF4D2E45EC331FAB843495 /* defeat.mp3 in Resources */,
+				ED8380A4A405FE18F7288439 /* defeat.mp3 in Resources */,
 				99A900C8C96474E3EA25F028 /* hit.mp3 in Resources */,
 				DB5D83BE2DEDFF1F0971C0B7 /* kill.mp3 in Resources */,
 				2D450C1C4FE874C8FEF31E8B /* miss.mp3 in Resources */,
-				8A338828622C9EBBE81864A1 /* victory.mp3 in Resources */,
+				4166EF193155DF0A22D11C4E /* victory.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,11 +533,15 @@
 				E499A3A607DB7B10FB56420B /* AchievementService.swift in Sources */,
 				23DCF63DEA0E035D0EF3D53D /* AchievementsView.swift in Sources */,
 				20E6368E9F42B31341BBAD1A /* AchievementsViewModel.swift in Sources */,
+				4E10144DF5A2354EA7C5D635 /* AdConfig.swift in Sources */,
+				B33FC9D94443194D781694CF /* AdService.swift in Sources */,
 				DECC292BC0801ECC7BB7C7C2 /* Airplane.swift in Sources */,
 				DA017C7E7A8D49498CE6D951 /* AirplaneShapeView.swift in Sources */,
 				AC329016BEEAA90606A33136 /* AppViewModel.swift in Sources */,
+				3EABBD13AF61664D3E76CB0A /* AppleSignInService.swift in Sources */,
 				4B3BD206C98DC965F3623131 /* AudioService.swift in Sources */,
 				B383F69F372065E7BACB6E81 /* AuthService.swift in Sources */,
+				6F09003D3D8E10B485A76DF5 /* BannerAdView.swift in Sources */,
 				6DD4AFC550B2819C9FAAF410 /* BattleReportView.swift in Sources */,
 				75F743821856D9F25D41E14D /* BoardGridView.swift in Sources */,
 				D09E0EF0BC1A535B31225300 /* BoardManager.swift in Sources */,
@@ -517,6 +563,8 @@
 				12839376A3873394BCBF2368 /* GameView.swift in Sources */,
 				75E58B68CA31475A2ED0D46C /* GameViewModel.swift in Sources */,
 				6D3135B201874EEE748FDF6C /* HeadshotAirBattleApp.swift in Sources */,
+				31ACEB6B579E847D436ACC2F /* IAPConfig.swift in Sources */,
+				238E191E9A1E24E6D23202D7 /* IAPService.swift in Sources */,
 				08BFEDDC7627BC0F038722E0 /* LeaderboardView.swift in Sources */,
 				F916F4452ADEFCE5B74F318B /* LeaderboardViewModel.swift in Sources */,
 				0C3C4779DCE908789474E525 /* MainMenuView.swift in Sources */,
@@ -528,6 +576,7 @@
 				B498F76006B3074700AFB5C3 /* OnlineGameView.swift in Sources */,
 				F08E124DADC9656DAC2991B4 /* OnlineGameViewModel.swift in Sources */,
 				59E7038BC53046D240CF1AFF /* OnlineModeView.swift in Sources */,
+				E3D019B972DCA36D87A0F00A /* PrivacyPolicyView.swift in Sources */,
 				269F5D879C0D4F77BF1F3419 /* ProfileView.swift in Sources */,
 				A83C58333D4666DFED68C2E9 /* ProfileViewModel.swift in Sources */,
 				3F2A7E4F2042F4A2E906BEF4 /* RoomLobbyView.swift in Sources */,
@@ -541,6 +590,7 @@
 				900FBFE4C96C6A080333FDA5 /* SkinsView.swift in Sources */,
 				E20A7953534D12DEA80F3E6B /* SkinsViewModel.swift in Sources */,
 				8FBD61CE9EB0C2E426705ED2 /* StatisticsService.swift in Sources */,
+				E065539F5642A053AD144615 /* StoreView.swift in Sources */,
 				DD8A36B0BAA1F7E28EEE3F15 /* TurnTimerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -560,8 +610,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = HeadshotAirBattle/HeadshotAirBattle.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8J6A847P66;
 				INFOPLIST_FILE = HeadshotAirBattle/Resources/Info.plist;
@@ -572,7 +623,6 @@
 				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.headshotairbattle;
-				PROVISIONING_PROFILE_SPECIFIER = "com.headshotairbattle Development";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -735,8 +785,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = HeadshotAirBattle/HeadshotAirBattle.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8J6A847P66;
 				INFOPLIST_FILE = HeadshotAirBattle/Resources/Info.plist;
@@ -747,7 +798,6 @@
 				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.headshotairbattle;
-				PROVISIONING_PROFILE_SPECIFIER = "com.headshotairbattle Development";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -796,6 +846,14 @@
 				version = 11.6.0;
 			};
 		};
+		C20048AB30E233502CC9BE73 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads";
+			requirement = {
+				kind = exactVersion;
+				version = 11.13.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -803,6 +861,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 668FC22631170739F0B95DAF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		531477DD4C0231FEC0810021 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C20048AB30E233502CC9BE73 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
 		};
 		735E77B78D02F16B9EFEFC58 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;

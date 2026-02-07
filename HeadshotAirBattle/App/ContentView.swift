@@ -14,6 +14,8 @@ enum AppRoute: Hashable {
     case skins
     case achievements
     case onlineMode
+    case store
+    case privacyPolicy
     case matchmaking(mode: String)
     case roomLobby(gameId: String, roomCode: String?)
     case onlineGame(gameId: String)
@@ -34,6 +36,8 @@ enum AppRoute: Hashable {
         case .skins: hasher.combine("skins")
         case .achievements: hasher.combine("achievements")
         case .onlineMode: hasher.combine("onlineMode")
+        case .store: hasher.combine("store")
+        case .privacyPolicy: hasher.combine("privacyPolicy")
         case .matchmaking(let m): hasher.combine("matchmaking"); hasher.combine(m)
         case .roomLobby(let g, let r): hasher.combine("roomLobby"); hasher.combine(g); hasher.combine(r)
         case .onlineGame(let g): hasher.combine("onlineGame"); hasher.combine(g)
@@ -84,6 +88,10 @@ struct ContentView: View {
                         AchievementsView(navigationPath: $navigationPath)
                     case .onlineMode:
                         OnlineModeView(navigationPath: $navigationPath)
+                    case .store:
+                        StoreView(navigationPath: $navigationPath)
+                    case .privacyPolicy:
+                        PrivacyPolicyView(navigationPath: $navigationPath)
                     case .matchmaking(let mode):
                         MatchmakingView(navigationPath: $navigationPath, mode: mode)
                     case .roomLobby(let gameId, let roomCode):

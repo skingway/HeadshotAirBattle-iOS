@@ -59,9 +59,13 @@ struct MainMenuView: View {
                         SmallMenuButton(title: "Skins", icon: "paintbrush.fill") {
                             navigationPath.append(AppRoute.skins)
                         }
-                        SmallMenuButton(title: "Settings", icon: "gearshape.fill") {
-                            navigationPath.append(AppRoute.settings)
+                        SmallMenuButton(title: "Store", icon: "cart.fill") {
+                            navigationPath.append(AppRoute.store)
                         }
+                    }
+
+                    SmallMenuButton(title: "Settings", icon: "gearshape.fill") {
+                        navigationPath.append(AppRoute.settings)
                     }
                 }
                 .padding(.horizontal, 24)
@@ -74,6 +78,9 @@ struct MainMenuView: View {
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
+
+                // Banner ad at bottom
+                ConditionalBannerAd()
             }
         }
         .navigationBarHidden(true)

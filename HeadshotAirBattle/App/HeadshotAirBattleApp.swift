@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseCore
+import GoogleMobileAds
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
@@ -19,6 +20,20 @@ struct HeadshotAirBattleApp: App {
             ContentView()
                 .environmentObject(appViewModel)
                 .preferredColorScheme(.dark)
+                .onAppear {
+                    // Only initialize AdMob if a real app ID is configured
+                    if let adId = Bundle.main.infoDictionary?["GADApplicationIdentifier"] as? String,
+                       !adId.contains("XXXXXXXXXX") {
+                        AdService.shared.initialize()
+                    } else {
+                        print("[AdService] Skipped initialization: no valid GADApplicationIdentifier configured")
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                    if AdService.shared.isInitialized {
+                        AdService.shared.requestTrackingPermission()
+                    }
+                }
         }
     }
 }

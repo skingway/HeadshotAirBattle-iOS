@@ -12,7 +12,7 @@ struct ProfileView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     // Avatar
-                    Image(systemName: "person.circle.fill")
+                    Image(systemName: appViewModel.isSignedInWithApple ? "apple.logo" : "person.circle.fill")
                         .font(.system(size: 80))
                         .foregroundColor(.cyan)
 
@@ -22,13 +22,49 @@ struct ProfileView: View {
                             .font(.title2.bold())
                             .foregroundColor(.white)
 
+                        if appViewModel.isSignedInWithApple, let name = appViewModel.userProfile?.appleDisplayName {
+                            Text(name)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+
                         Button("Edit Nickname") {
-                            viewModel.newNickname = appViewModel.nickname  // 预填充当前昵称
+                            viewModel.newNickname = appViewModel.nickname
                             viewModel.errorMessage = nil
                             viewModel.showEditNickname = true
                         }
                         .font(.caption)
                         .foregroundColor(.cyan)
+                    }
+
+                    // Apple Sign-In prompt for anonymous users
+                    if !appViewModel.isSignedInWithApple && !appViewModel.isOfflineMode {
+                        Button(action: {
+                            Task {
+                                await appViewModel.signInWithApple()
+                            }
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "apple.logo")
+                                    .font(.title3)
+                                Text("Sign in with Apple")
+                                    .font(.headline)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.black)
+                            .cornerRadius(10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                            )
+                        }
+                        .padding(.horizontal)
+
+                        Text("Sign in to save your progress across devices")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
                     }
 
                     // Stats
@@ -47,7 +83,7 @@ struct ProfileView: View {
                         .cornerRadius(12)
                     }
 
-                    // 成功消息
+                    // Success message
                     if let success = viewModel.successMessage {
                         Text(success)
                             .font(.caption)
@@ -57,7 +93,7 @@ struct ProfileView: View {
                             .cornerRadius(8)
                     }
 
-                    // 错误消息（持久显示，不只在 alert 中）
+                    // Error message
                     if let error = viewModel.errorMessage {
                         Text(error)
                             .font(.caption)

@@ -40,4 +40,34 @@ class SkinService {
         setAirplaneSkin("blue")
         setBoardTheme("default")
     }
+
+    /// Check if a skin is unlocked (by games played or IAP purchase)
+    @MainActor
+    func isSkinUnlocked(_ skin: AirplaneSkinDef, totalGames: Int) -> Bool {
+        // Purchased Premium Skin Pack → unlock ALL skins
+        if IAPService.shared.isPurchased(.premiumSkinPack) {
+            return true
+        }
+        // Premium skins (unlockRequirement == -1): require IAP only
+        if skin.unlockRequirement < 0 {
+            return false
+        }
+        // Regular skins: unlock by games played
+        return totalGames >= skin.unlockRequirement
+    }
+
+    /// Check if a theme is unlocked (by wins or IAP purchase)
+    @MainActor
+    func isThemeUnlocked(_ theme: BoardThemeDef, wins: Int) -> Bool {
+        // Purchased Premium Theme Pack → unlock ALL themes
+        if IAPService.shared.isPurchased(.premiumThemePack) {
+            return true
+        }
+        // Premium themes (unlockRequirement == -1): require IAP only
+        if theme.unlockRequirement < 0 {
+            return false
+        }
+        // Regular themes: unlock by wins
+        return wins >= theme.unlockRequirement
+    }
 }

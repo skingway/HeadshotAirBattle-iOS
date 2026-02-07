@@ -28,6 +28,9 @@ struct GameView: View {
 
                 case .gameOver:
                     gameOverView
+                        .onAppear {
+                            AdService.shared.onGameFinished()
+                        }
 
                 default:
                     ProgressView("Loading...")

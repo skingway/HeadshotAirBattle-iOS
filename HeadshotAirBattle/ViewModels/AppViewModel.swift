@@ -12,6 +12,22 @@ class AppViewModel: ObservableObject {
 
     private let db = Firestore.firestore()
 
+    // MARK: - Computed Properties
+
+    var isSignedInWithApple: Bool {
+        userProfile?.authProvider == "apple"
+    }
+
+    var authProviderDisplayName: String {
+        if isOfflineMode { return "Offline" }
+        switch userProfile?.authProvider {
+        case "apple": return "Apple"
+        default: return "Guest"
+        }
+    }
+
+    // MARK: - Initialization
+
     func initialize() async {
         isLoading = true
         defer { isLoading = false }
@@ -32,6 +48,117 @@ class AppViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Apple Sign-In
+
+    func signInWithApple() async {
+        do {
+            let credential = try await AppleSignInService.shared.signIn()
+
+            guard let currentUser = Auth.auth().currentUser else {
+                errorMessage = "No current user session"
+                return
+            }
+
+            // Try to link anonymous account to Apple credential (preserves UID and data)
+            let authResult: AuthDataResult
+            do {
+                authResult = try await currentUser.link(with: credential)
+                print("[AppViewModel] Successfully linked anonymous account to Apple")
+            } catch let linkError as NSError where linkError.code == AuthErrorCode.credentialAlreadyInUse.rawValue {
+                // Apple account already linked to another Firebase user — switch to that account
+                print("[AppViewModel] Apple account already linked, signing in directly")
+                authResult = try await Auth.auth().signIn(with: credential)
+            } catch {
+                throw error
+            }
+
+            let userId = authResult.user.uid
+
+            // Update profile with Apple info
+            let appleDisplayName = UserDefaults.standard.string(forKey: "apple_display_name")
+            let appleEmail = UserDefaults.standard.string(forKey: "apple_email")
+            let now = Date().timeIntervalSince1970 * 1000
+
+            var updateData: [String: Any] = [
+                "authProvider": "apple",
+                "linkedAt": now
+            ]
+            if let name = appleDisplayName { updateData["appleDisplayName"] = name }
+            if let email = appleEmail { updateData["appleEmail"] = email }
+
+            try await db.collection("users").document(userId).updateData(updateData)
+
+            // Reload profile
+            await loadOrCreateProfile(userId: userId)
+            userProfile?.authProvider = "apple"
+            userProfile?.appleDisplayName = appleDisplayName
+            userProfile?.appleEmail = appleEmail
+            userProfile?.linkedAt = now
+            saveProfileLocally()
+
+            print("[AppViewModel] Apple Sign-In complete for user: \(userId)")
+        } catch {
+            print("[AppViewModel] Apple Sign-In failed: \(error.localizedDescription)")
+            errorMessage = "Sign in failed: \(error.localizedDescription)"
+        }
+    }
+
+    // MARK: - Sign Out
+
+    func signOut() async {
+        do {
+            try Auth.auth().signOut()
+        } catch {
+            print("[AppViewModel] Sign out error: \(error.localizedDescription)")
+        }
+
+        // Clear Apple-specific data
+        UserDefaults.standard.removeObject(forKey: "apple_display_name")
+        UserDefaults.standard.removeObject(forKey: "apple_email")
+        UserDefaults.standard.removeObject(forKey: "apple_user_id")
+
+        // Re-initialize with new anonymous account
+        userProfile = nil
+        isAuthenticated = false
+        await initialize()
+    }
+
+    // MARK: - Delete Account
+
+    func deleteAccount() async {
+        guard let userId = userProfile?.userId else { return }
+
+        do {
+            // Delete Firestore data
+            try await db.collection("users").document(userId).delete()
+
+            // Delete Firebase Auth account
+            try await Auth.auth().currentUser?.delete()
+        } catch {
+            print("[AppViewModel] Delete account error: \(error.localizedDescription)")
+        }
+
+        // Clear all local data
+        let keys = [
+            GameConstants.StorageKeys.offlineUserProfile,
+            GameConstants.StorageKeys.offlineStatistics,
+            GameConstants.StorageKeys.offlineGameHistory,
+            GameConstants.StorageKeys.achievementsData,
+            GameConstants.StorageKeys.airplaneSkin,
+            GameConstants.StorageKeys.boardTheme,
+            GameConstants.StorageKeys.iapPurchases,
+            "apple_display_name", "apple_email", "apple_user_id"
+        ]
+        keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+
+        // Re-initialize
+        userProfile = nil
+        isAuthenticated = false
+        await initialize()
+    }
+
+    // MARK: - Profile Management
+
     private func loadOrCreateProfile(userId: String) async {
         let docRef = db.collection("users").document(userId)
 
@@ -50,6 +177,10 @@ class AppViewModel: ObservableObject {
                 userProfile?.createdAt = data["createdAt"] as? Double ?? Date().timeIntervalSince1970 * 1000
                 userProfile?.nicknameChangedAt = data["nicknameChangedAt"] as? Double
                 userProfile?.selectedBackground = data["selectedBackground"] as? String
+                userProfile?.authProvider = data["authProvider"] as? String ?? "anonymous"
+                userProfile?.appleDisplayName = data["appleDisplayName"] as? String
+                userProfile?.appleEmail = data["appleEmail"] as? String
+                userProfile?.linkedAt = data["linkedAt"] as? Double
             } else {
                 // Create new profile
                 let nickname = generateNickname()
@@ -61,7 +192,8 @@ class AppViewModel: ObservableObject {
                     "totalGames": 0,
                     "wins": 0,
                     "losses": 0,
-                    "winRate": 0
+                    "winRate": 0,
+                    "authProvider": "anonymous"
                 ]
                 try await docRef.setData(profileData)
                 userProfile = profile
@@ -126,8 +258,9 @@ class AppViewModel: ObservableObject {
                          userInfo: [NSLocalizedDescriptionKey: "Invalid characters in nickname"])
         }
 
-        // Check cooldown
-        if let lastChanged = profile.nicknameChangedAt {
+        // Check cooldown (bypass if nickname_freedom purchased)
+        let hasNicknameFreedom = IAPService.shared.isPurchased(.nicknameFreedom)
+        if !hasNicknameFreedom, let lastChanged = profile.nicknameChangedAt {
             let cooldownEnd = lastChanged + GameConstants.Validation.nicknameChangeCooldown * 1000
             if Date().timeIntervalSince1970 * 1000 < cooldownEnd {
                 throw NSError(domain: "", code: -1,

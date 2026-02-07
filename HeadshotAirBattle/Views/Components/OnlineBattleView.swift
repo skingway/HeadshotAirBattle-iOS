@@ -271,13 +271,13 @@ struct OnlineBoardGridView: View {
                 }
             }
         }
-        .drawingGroup() // Performance optimization for large grids
+        .id("board-\(isOpponentBoard)-\(viewModel.myAttacks.count)-\(viewModel.opponentAttacks.count)")
     }
 }
 
 /// Single cell view for online battles
 struct OnlineCellView: View {
-    let viewModel: OnlineGameViewModel
+    @ObservedObject var viewModel: OnlineGameViewModel
     let row: Int
     let col: Int
     let isOpponentBoard: Bool
@@ -398,7 +398,7 @@ struct OnlineSmallBoardGridView: View {
 
 // 小棋盘的单元格视图
 struct OnlineSmallCellView: View {
-    let viewModel: OnlineGameViewModel
+    @ObservedObject var viewModel: OnlineGameViewModel
     let row: Int
     let col: Int
     let isOpponentBoard: Bool
@@ -527,7 +527,7 @@ struct OnlineLandscapeBoardGridView: View {
 
 // 横屏单元格视图
 struct OnlineLandscapeCellView: View {
-    let viewModel: OnlineGameViewModel
+    @ObservedObject var viewModel: OnlineGameViewModel
     let row: Int
     let col: Int
     let isOpponentBoard: Bool
