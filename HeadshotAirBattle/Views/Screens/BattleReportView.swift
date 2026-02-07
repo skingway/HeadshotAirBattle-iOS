@@ -11,6 +11,26 @@ struct BattleReportView: View {
         return min(max(availableWidth / CGFloat(gameData.boardSize), 12), 20)
     }
 
+    // 游戏时长估算（每回合约30秒）
+    private var estimatedDuration: String {
+        let seconds = gameData.totalTurns * 30
+        let minutes = seconds / 60
+        let remainingSeconds = seconds % 60
+        if minutes > 0 {
+            return "\(minutes)m \(remainingSeconds)s"
+        }
+        return "\(seconds)s"
+    }
+
+    // 效率计算（命中率）
+    private var playerEfficiency: String {
+        guard let stats = gameData.playerStats else { return "N/A" }
+        let total = stats.hits + stats.misses
+        guard total > 0 else { return "0%" }
+        let efficiency = Double(stats.hits) / Double(total) * 100
+        return String(format: "%.1f%%", efficiency)
+    }
+
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -27,12 +47,34 @@ struct BattleReportView: View {
                             .foregroundColor(gameData.winner == gameData.userId ? .green : .red)
                     }
 
-                    // Game info
-                    HStack(spacing: 16) {
-                        InfoBadge(icon: "square.grid.3x3", value: "\(gameData.boardSize)×\(gameData.boardSize)")
-                        InfoBadge(icon: "airplane", value: "\(gameData.airplaneCount)")
-                        InfoBadge(icon: "arrow.triangle.2.circlepath", value: "\(gameData.totalTurns)")
+                    // Game summary
+                    VStack(spacing: 12) {
+                        HStack(spacing: 16) {
+                            InfoBadge(icon: "square.grid.3x3", value: "\(gameData.boardSize)×\(gameData.boardSize)")
+                            InfoBadge(icon: "airplane", value: "\(gameData.airplaneCount)")
+                            InfoBadge(icon: "arrow.triangle.2.circlepath", value: "\(gameData.totalTurns) turns")
+                        }
+                        HStack(spacing: 16) {
+                            InfoBadge(icon: "clock", value: "~\(estimatedDuration)")
+                            InfoBadge(icon: "target", value: "\(playerEfficiency) hit rate")
+                        }
                     }
+
+                    // Players section
+                    HStack(spacing: 12) {
+                        PlayerCard(
+                            name: "You",
+                            isWinner: gameData.winner == gameData.userId,
+                            stats: gameData.playerStats
+                        )
+
+                        PlayerCard(
+                            name: gameData.opponent,
+                            isWinner: gameData.winner != gameData.userId,
+                            stats: gameData.aiStats
+                        )
+                    }
+                    .padding(.horizontal)
 
                     // Battle Boards - 双方棋盘对比
                     if gameData.playerBoardData != nil || gameData.aiBoardData != nil {
@@ -299,5 +341,62 @@ struct StatItem: View {
                 .foregroundColor(.white)
                 .font(.caption.bold())
         }
+    }
+}
+
+// 玩家信息卡片（胜者高亮）
+struct PlayerCard: View {
+    let name: String
+    let isWinner: Bool
+    let stats: GameStats?
+
+    var body: some View {
+        VStack(spacing: 8) {
+            // 玩家名称
+            HStack {
+                Text(name)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                if isWinner {
+                    Image(systemName: "crown.fill")
+                        .font(.caption)
+                        .foregroundColor(.yellow)
+                }
+            }
+
+            // 简要统计
+            if let stats = stats {
+                HStack(spacing: 12) {
+                    VStack {
+                        Text("\(stats.hits)")
+                            .font(.title2.bold())
+                            .foregroundColor(.orange)
+                        Text("Hits")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                    }
+                    VStack {
+                        Text("\(stats.kills)")
+                            .font(.title2.bold())
+                            .foregroundColor(.red)
+                        Text("Kills")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(
+            isWinner ?
+            LinearGradient(colors: [Color.yellow.opacity(0.3), Color.orange.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing) :
+            Color.gray.opacity(0.1)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isWinner ? Color.yellow : Color.gray.opacity(0.3), lineWidth: isWinner ? 2 : 1)
+        )
+        .cornerRadius(12)
     }
 }
