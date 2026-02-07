@@ -4,13 +4,31 @@ import SwiftUI
 struct DualBoardView: View {
     @ObservedObject var viewModel: GameViewModel
     private let themeColors = SkinDefinitions.currentThemeColors()
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
 
     // 使用 totalTurns 作为刷新触发器，确保每次攻击后视图刷新
     private var refreshTrigger: Int {
         viewModel.totalTurns
     }
 
+    // 检测是否为横屏
+    private var isLandscape: Bool {
+        horizontalSizeClass == .regular && verticalSizeClass == .compact
+    }
+
     var body: some View {
+        Group {
+            if isLandscape {
+                landscapeLayout
+            } else {
+                portraitLayout
+            }
+        }
+    }
+
+    // 竖屏布局（原有布局）
+    private var portraitLayout: some View {
         VStack(spacing: 8) {
             // Turn indicator
             HStack {
@@ -98,6 +116,102 @@ struct DualBoardView: View {
 
             // Game log
             GameLogView(logs: viewModel.gameLog)
+        }
+    }
+
+    // 横屏布局（棋盘左右排列）
+    private var landscapeLayout: some View {
+        VStack(spacing: 4) {
+            // Turn indicator
+            HStack {
+                Circle()
+                    .fill(viewModel.isPlayerTurn ? Color.green : Color.red)
+                    .frame(width: 10, height: 10)
+                Text(viewModel.isPlayerTurn ? "Your Turn" : "Opponent's Turn")
+                    .font(.headline)
+                    .foregroundColor(.white)
+
+                Spacer()
+
+                // Timer
+                TurnTimerView(timeRemaining: viewModel.turnTimeRemaining)
+
+                // Surrender button
+                Button(action: {
+                    viewModel.surrender()
+                }) {
+                    Text("Surrender")
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.red.opacity(0.8))
+                        .cornerRadius(8)
+                }
+            }
+            .padding(.horizontal)
+
+            HStack(spacing: 12) {
+                // Opponent board (attack target)
+                VStack(spacing: 4) {
+                    HStack {
+                        Text("Enemy Fleet")
+                            .font(.caption.bold())
+                            .foregroundColor(.cyan)
+                        Spacer()
+                        if let board = viewModel.opponentBoard {
+                            Text("Remaining: \(board.getRemainingAirplaneCount())")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    .padding(.horizontal, 8)
+
+                    if let board = viewModel.opponentBoard {
+                        BoardGridView(
+                            board: board,
+                            revealAirplanes: false,
+                            isInteractive: viewModel.isPlayerTurn,
+                            themeColors: themeColors,
+                            onCellTap: { row, col in
+                                viewModel.playerAttack(row: row, col: col)
+                            }
+                        )
+                        .id(refreshTrigger)
+                    }
+                }
+
+                // Player board (reveal own airplanes)
+                VStack(spacing: 4) {
+                    HStack {
+                        Text("Your Fleet")
+                            .font(.caption.bold())
+                            .foregroundColor(.green)
+                        Spacer()
+                        if let board = viewModel.playerBoard {
+                            Text("Remaining: \(board.getRemainingAirplaneCount())")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    .padding(.horizontal, 8)
+
+                    if let board = viewModel.playerBoard {
+                        BoardGridView(
+                            board: board,
+                            revealAirplanes: true,
+                            isInteractive: false,
+                            themeColors: themeColors
+                        )
+                        .id(refreshTrigger)
+                    }
+                }
+            }
+            .padding(.horizontal)
+
+            // Game log (compact in landscape)
+            GameLogView(logs: viewModel.gameLog)
+                .frame(height: 40)
         }
     }
 }

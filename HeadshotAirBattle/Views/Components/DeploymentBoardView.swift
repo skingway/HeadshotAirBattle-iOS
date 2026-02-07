@@ -45,26 +45,23 @@ struct DeploymentBoardView: View {
 
             // 棋盘区域
             if let board = viewModel.playerBoard {
-                ZStack(alignment: .topLeading) {
-                    boardGrid(board: board)
+                GeometryReader { geo in
+                    ZStack(alignment: .topLeading) {
+                        boardGrid(board: board)
 
-                    if isDragging && dragHeadRow >= -2 && dragHeadCol >= -2 {
-                        dragPreviewOverlay(board: board)
-                            .allowsHitTesting(false)
+                        if isDragging && dragHeadRow >= -2 && dragHeadCol >= -2 {
+                            dragPreviewOverlay(board: board)
+                                .allowsHitTesting(false)
+                        }
+                    }
+                    .onAppear {
+                        gridOriginInGlobal = geo.frame(in: .global).origin
+                    }
+                    .onChange(of: geo.frame(in: .global).origin) { newOrigin in
+                        gridOriginInGlobal = newOrigin
                     }
                 }
                 .frame(width: boardWidth, height: boardHeight)
-                .background(
-                    GeometryReader { geo in
-                        Color.clear.preference(
-                            key: GridOriginPreferenceKey.self,
-                            value: geo.frame(in: .global).origin
-                        )
-                    }
-                )
-                .onPreferenceChange(GridOriginPreferenceKey.self) { origin in
-                    gridOriginInGlobal = origin
-                }
             }
 
             // 错误提示

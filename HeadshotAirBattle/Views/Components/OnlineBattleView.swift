@@ -4,8 +4,26 @@ import SwiftUI
 struct OnlineBattleView: View {
     @ObservedObject var viewModel: OnlineGameViewModel
     private let themeColors = SkinDefinitions.currentThemeColors()
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
+
+    // 检测是否为横屏
+    private var isLandscape: Bool {
+        horizontalSizeClass == .regular && verticalSizeClass == .compact
+    }
 
     var body: some View {
+        Group {
+            if isLandscape {
+                landscapeLayout
+            } else {
+                portraitLayout
+            }
+        }
+    }
+
+    // 竖屏布局（原有布局）
+    private var portraitLayout: some View {
         VStack(spacing: 8) {
             // Turn indicator
             HStack {
@@ -84,6 +102,90 @@ struct OnlineBattleView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(height: 60)
+            .padding(.horizontal)
+        }
+    }
+
+    // 横屏布局
+    private var landscapeLayout: some View {
+        VStack(spacing: 4) {
+            // Turn indicator
+            HStack {
+                Circle()
+                    .fill(viewModel.isMyTurn ? Color.green : Color.red)
+                    .frame(width: 12, height: 12)
+                Text(viewModel.isMyTurn ? "Your Turn - Tap to Attack" : "Opponent's Turn")
+                    .font(.headline)
+                    .foregroundColor(.white)
+
+                Spacer()
+
+                // 投降按钮
+                Button(action: {
+                    viewModel.surrender()
+                }) {
+                    Text("Surrender")
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.red.opacity(0.8))
+                        .cornerRadius(8)
+                }
+            }
+            .padding(.horizontal)
+
+            HStack(spacing: 12) {
+                // Opponent board (attack target)
+                VStack(spacing: 4) {
+                    HStack {
+                        Text("Enemy Fleet (\(viewModel.opponentNickname))")
+                            .font(.caption.bold())
+                            .foregroundColor(.cyan)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 8)
+
+                    OnlineBoardGridView(
+                        viewModel: viewModel,
+                        isOpponentBoard: true,
+                        isInteractive: viewModel.isMyTurn,
+                        themeColors: themeColors
+                    )
+                }
+
+                // Player board (show own airplanes and opponent's attacks)
+                VStack(spacing: 4) {
+                    HStack {
+                        Text("Your Fleet")
+                            .font(.caption.bold())
+                            .foregroundColor(.green)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 8)
+
+                    OnlineBoardGridView(
+                        viewModel: viewModel,
+                        isOpponentBoard: false,
+                        isInteractive: false,
+                        themeColors: themeColors
+                    )
+                }
+            }
+            .padding(.horizontal)
+
+            // Game log (compact in landscape)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(viewModel.gameLog.suffix(5), id: \.self) { log in
+                        Text(log)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .frame(height: 40)
             .padding(.horizontal)
         }
     }
