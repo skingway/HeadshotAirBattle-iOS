@@ -68,8 +68,6 @@ ios-deploy --bundle "/Users/wangsisi/Library/Developer/Xcode/DerivedData/Headsho
 | Item | Description | Priority |
 |------|-------------|----------|
 | Quick Match cross-platform | iOS-iOS tested OK for rooms. Quick Match needs more cross-platform testing (Android crash reported when Android starts first) | Medium |
-| Online: Battle Report | Android has a detailed BattleReportScreen after online games; iOS shows basic game over | Low |
-| Orientation support | iOS auto-adapts via SwiftUI but may need polish for landscape in online battle | Low |
 | Achievements for online | Achievement checking not triggered for online games (only single player) | Low |
 
 ---
@@ -164,7 +162,12 @@ waiting → deploying → battle → finished
 
 ## Recent Changes
 
-### 2026-02-07
+### 2026-02-07 (Evening Update)
+1. **Fixed deployment drag offset** - Airplane preview now accurately follows finger position during drag
+2. **Added landscape orientation support** - Both AI and online battles now display boards side-by-side in landscape mode
+3. **Enhanced battle report** - Added game duration estimation, player efficiency, and winner-highlighted player cards (matching Android version)
+
+### 2026-02-07 (Morning Update)
 1. **Fixed online battle airplane display** - Player's deployed airplanes now show consistent detailed shapes in battle view
 2. **Fixed Data Analyst achievement** - Achievement now unlocks when viewing battle reports
 3. **Improved skin/theme unlock display** - Shows detailed progress like "Need 3 more games" instead of generic text
