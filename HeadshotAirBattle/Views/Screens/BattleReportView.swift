@@ -389,9 +389,13 @@ struct PlayerCard: View {
         .frame(maxWidth: .infinity)
         .padding()
         .background(
-            isWinner ?
-            LinearGradient(colors: [Color.yellow.opacity(0.3), Color.orange.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing) :
-            Color.gray.opacity(0.1)
+            LinearGradient(
+                colors: isWinner ?
+                    [Color.yellow.opacity(0.3), Color.orange.opacity(0.2)] :
+                    [Color.gray.opacity(0.1), Color.gray.opacity(0.1)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)

@@ -35,7 +35,7 @@
 		704D31B10D0356E139010341 /* CountdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A36ADF61CF7D6B98A929DEA /* CountdownView.swift */; };
 		75E58B68CA31475A2ED0D46C /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D60213504BE84FB87F1E8F /* GameViewModel.swift */; };
 		75F743821856D9F25D41E14D /* BoardGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7492283D514265549C5E85C8 /* BoardGridView.swift */; };
-		8A338828622C9EBBE81864A1 /* victory.wav in Resources */ = {isa = PBXBuildFile; fileRef = F282E34DF1E413BEB63A6BC9 /* victory.wav */; };
+		8A338828622C9EBBE81864A1 /* victory.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F282E34DF1E413BEB63A6BC9 /* victory.mp3 */; };
 		8C3195454A5944DF52BF34D6 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E97A5E0AECB807A7404F06E /* Extensions.swift */; };
 		8D782DDFB68B00FD8F6923B3 /* BoardManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B63DF6243004326FB546843 /* BoardManagerTests.swift */; };
 		8E8C9CAB6C1B58EF758BAEF7 /* OnlineBattleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8404FA3AAC5B592741E546 /* OnlineBattleView.swift */; };
@@ -49,7 +49,7 @@
 		A7BE42392DCBBFF7703330E4 /* bgm.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7D349CD671FB34072EDE3268 /* bgm.mp3 */; };
 		A83C58333D4666DFED68C2E9 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2113E2EB0494D0C4AF1A170 /* ProfileViewModel.swift */; };
 		AA44F70665F6FF74B2D079C9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D34B24AC156E3AEDB7CFBFE /* ContentView.swift */; };
-		ABDF4D2E45EC331FAB843495 /* defeat.wav in Resources */ = {isa = PBXBuildFile; fileRef = DEBFAF3376EA111A70EA65F2 /* defeat.wav */; };
+		ABDF4D2E45EC331FAB843495 /* defeat.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DEBFAF3376EA111A70EA65F2 /* defeat.mp3 */; };
 		AC329016BEEAA90606A33136 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26D5AFE9BC0D484E9CD4B20 /* AppViewModel.swift */; };
 		AD0DB12C7F080BEA7A8FB280 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10837E3224A19514E90D408B /* GameState.swift */; };
 		AF1A191CB435BF6DF3C930E8 /* AIStrategyHard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181A119842E8C6105961A1E7 /* AIStrategyHard.swift */; };
@@ -156,14 +156,14 @@
 		DA6B32CAC4278FF1C166005D /* MatchmakingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchmakingViewModel.swift; sourceTree = "<group>"; };
 		DC8145532F9F4BF11AE73975 /* MatchmakingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchmakingService.swift; sourceTree = "<group>"; };
 		DCCF2C4E0D008CDC5710F7B9 /* CoordinateSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinateSystem.swift; sourceTree = "<group>"; };
-		DEBFAF3376EA111A70EA65F2 /* defeat.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = defeat.wav; sourceTree = "<group>"; };
+		DEBFAF3376EA111A70EA65F2 /* defeat.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = defeat.mp3; sourceTree = "<group>"; };
 		E25DBE4670843A8C107E3465 /* RoomLobbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomLobbyView.swift; sourceTree = "<group>"; };
 		E68164DA03AB0ABE1A379088 /* GameLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameLogView.swift; sourceTree = "<group>"; };
 		E8BCD62322CB12120C77CA24 /* OnlineGameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineGameViewModel.swift; sourceTree = "<group>"; };
 		EBD86685E02FDEF10D81931C /* OnlineModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineModeView.swift; sourceTree = "<group>"; };
 		EDD10FC52CFC823ABBADB0DD /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		F25FB798EF3C2C0523CB6B84 /* RoomService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomService.swift; sourceTree = "<group>"; };
-		F282E34DF1E413BEB63A6BC9 /* victory.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = victory.wav; sourceTree = "<group>"; };
+		F282E34DF1E413BEB63A6BC9 /* victory.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = victory.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,11 +209,11 @@
 			isa = PBXGroup;
 			children = (
 				7D349CD671FB34072EDE3268 /* bgm.mp3 */,
-				DEBFAF3376EA111A70EA65F2 /* defeat.wav */,
+				DEBFAF3376EA111A70EA65F2 /* defeat.mp3 */,
 				A5DA20655A105FF98D1C241C /* hit.mp3 */,
 				D6FD9554FE452743B4B23793 /* kill.mp3 */,
 				D0894DC6F4F80F379B79F98A /* miss.mp3 */,
-				F282E34DF1E413BEB63A6BC9 /* victory.wav */,
+				F282E34DF1E413BEB63A6BC9 /* victory.mp3 */,
 			);
 			path = Sounds;
 			sourceTree = "<group>";
@@ -459,11 +459,11 @@
 				BF31F2CBE35CDC2245707026 /* Assets.xcassets in Resources */,
 				D2325A29CBD346C8E19214FD /* GoogleService-Info.plist in Resources */,
 				A7BE42392DCBBFF7703330E4 /* bgm.mp3 in Resources */,
-				ABDF4D2E45EC331FAB843495 /* defeat.wav in Resources */,
+				ABDF4D2E45EC331FAB843495 /* defeat.mp3 in Resources */,
 				99A900C8C96474E3EA25F028 /* hit.mp3 in Resources */,
 				DB5D83BE2DEDFF1F0971C0B7 /* kill.mp3 in Resources */,
 				2D450C1C4FE874C8FEF31E8B /* miss.mp3 in Resources */,
-				8A338828622C9EBBE81864A1 /* victory.wav in Resources */,
+				8A338828622C9EBBE81864A1 /* victory.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
