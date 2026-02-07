@@ -40,67 +40,75 @@
   <line x1="132" y1="512" x2="200" y2="512" stroke="rgba(255,255,255,0.3)" stroke-width="4"/>
   <line x1="824" y1="512" x2="892" y2="512" stroke="rgba(255,255,255,0.3)" stroke-width="4"/>
 
-  <!-- Modern Fighter Jet (F-16 style) - Based on reference image -->
-  <g transform="translate(512, 512)" filter="url(#glow)">
-    <!-- Main fuselage (center body) -->
+  <!-- Modern Fighter Jet (F-16 style) - LARGER & BRIGHTER -->
+  <g transform="translate(512, 512) scale(1.3)" filter="url(#glow)">
+    <!-- Main fuselage (center body) - BRIGHTER BLUE -->
     <path d="M 0,-280 L -35,-200 L -45,-50 L -50,50 L -40,150 L 0,180 L 40,150 L 50,50 L 45,-50 L 35,-200 Z"
-          fill="#7DA3B8" stroke="#5A7F8F" stroke-width="4"/>
+          fill="#A8D5E2" stroke="#7FB3C4" stroke-width="4"/>
 
-    <!-- Left main wing (swept back) -->
+    <!-- Left main wing (swept back) - BRIGHTER -->
     <path d="M -45,-30 L -280,80 L -290,100 L -280,120 L -50,60 L -45,10 Z"
-          fill="#8BB4C9" stroke="#5A7F8F" stroke-width="5"/>
+          fill="#BCE3F0" stroke="#7FB3C4" stroke-width="5"/>
 
-    <!-- Right main wing (swept back) -->
+    <!-- Right main wing (swept back) - BRIGHTER -->
     <path d="M 45,-30 L 280,80 L 290,100 L 280,120 L 50,60 L 45,10 Z"
-          fill="#8BB4C9" stroke="#5A7F8F" stroke-width="5"/>
+          fill="#BCE3F0" stroke="#7FB3C4" stroke-width="5"/>
 
     <!-- Left tail wing -->
     <path d="M -40,120 L -130,180 L -135,200 L -125,215 L -35,160 Z"
-          fill="#7DA3B8" stroke="#5A7F8F" stroke-width="4"/>
+          fill="#A8D5E2" stroke="#7FB3C4" stroke-width="4"/>
 
     <!-- Right tail wing -->
     <path d="M 40,120 L 130,180 L 135,200 L 125,215 L 35,160 Z"
-          fill="#7DA3B8" stroke="#5A7F8F" stroke-width="4"/>
+          fill="#A8D5E2" stroke="#7FB3C4" stroke-width="4"/>
 
     <!-- Vertical stabilizer (tail fin) -->
     <path d="M -15,150 L -20,200 L 0,240 L 20,200 L 15,150 Z"
-          fill="#6B92A4" stroke="#5A7F8F" stroke-width="4"/>
+          fill="#95C8D8" stroke="#7FB3C4" stroke-width="4"/>
 
     <!-- Cockpit canopy -->
-    <ellipse cx="0" cy="-150" rx="28" ry="45" fill="#2A5270" opacity="0.7"/>
-    <ellipse cx="0" cy="-155" rx="20" ry="30" fill="#1e3a52" opacity="0.5"/>
+    <ellipse cx="0" cy="-150" rx="28" ry="45" fill="#3A7CA5" opacity="0.8"/>
+    <ellipse cx="0" cy="-155" rx="20" ry="30" fill="#2A5F7F" opacity="0.6"/>
 
     <!-- Engine intakes (side details) -->
-    <ellipse cx="-45" cy="-80" rx="8" ry="20" fill="#4A6A7A" opacity="0.6"/>
-    <ellipse cx="45" cy="-80" rx="8" ry="20" fill="#4A6A7A" opacity="0.6"/>
+    <ellipse cx="-45" cy="-80" rx="8" ry="20" fill="#6B9FB8" opacity="0.7"/>
+    <ellipse cx="45" cy="-80" rx="8" ry="20" fill="#6B9FB8" opacity="0.7"/>
 
     <!-- Wing weapon pods -->
-    <circle cx="-260" cy="100" r="18" fill="#5A7F8F" opacity="0.8"/>
-    <circle cx="260" cy="100" r="18" fill="#5A7F8F" opacity="0.8"/>
+    <circle cx="-260" cy="100" r="18" fill="#7FB3C4" opacity="0.9"/>
+    <circle cx="260" cy="100" r="18" fill="#7FB3C4" opacity="0.9"/>
 
     <!-- Panel lines (detail) -->
-    <line x1="-20" y1="-200" x2="-25" y2="100" stroke="#4A6A7A" stroke-width="2" opacity="0.4"/>
-    <line x1="20" y1="-200" x2="25" y2="100" stroke="#4A6A7A" stroke-width="2" opacity="0.4"/>
+    <line x1="-20" y1="-200" x2="-25" y2="100" stroke="#6B9FB8" stroke-width="2" opacity="0.5"/>
+    <line x1="20" y1="-200" x2="25" y2="100" stroke="#6B9FB8" stroke-width="2" opacity="0.5"/>
 
     <!-- Nose cone highlight -->
-    <ellipse cx="0" cy="-270" rx="12" ry="15" fill="white" opacity="0.6"/>
+    <ellipse cx="0" cy="-270" rx="12" ry="15" fill="white" opacity="0.7"/>
   </g>
 
-  <!-- RED TARGETING CROSSHAIR on nose (critical hit zone indicator) -->
-  <g transform="translate(512, 232)">
-    <!-- Red target circle -->
-    <circle cx="0" cy="0" r="50" fill="none" stroke="#EF4444" stroke-width="6" opacity="0.9"/>
-    <circle cx="0" cy="0" r="38" fill="none" stroke="#EF4444" stroke-width="4" opacity="0.7"/>
+  <!-- RED TARGETING CROSSHAIR on nose - LARGER, COVERS WHOLE NOSE -->
+  <g transform="translate(512, 148)">
+    <!-- Outer red target circle - MUCH LARGER -->
+    <circle cx="0" cy="0" r="95" fill="none" stroke="#DC2626" stroke-width="8" opacity="0.95"/>
+    <circle cx="0" cy="0" r="75" fill="none" stroke="#EF4444" stroke-width="6" opacity="0.85"/>
+    <circle cx="0" cy="0" r="55" fill="none" stroke="#F87171" stroke-width="5" opacity="0.75"/>
 
-    <!-- Crosshair lines -->
-    <line x1="-60" y1="0" x2="-52" y2="0" stroke="#EF4444" stroke-width="5"/>
-    <line x1="52" y1="0" x2="60" y2="0" stroke="#EF4444" stroke-width="5"/>
-    <line x1="0" y1="-60" x2="0" y2="-52" stroke="#EF4444" stroke-width="5"/>
-    <line x1="0" y1="52" x2="0" y2="60" stroke="#EF4444" stroke-width="5"/>
+    <!-- Crosshair lines - LONGER -->
+    <line x1="-110" y1="0" x2="-98" y2="0" stroke="#DC2626" stroke-width="7"/>
+    <line x1="98" y1="0" x2="110" y2="0" stroke="#DC2626" stroke-width="7"/>
+    <line x1="0" y1="-110" x2="0" y2="-98" stroke="#DC2626" stroke-width="7"/>
+    <line x1="0" y1="98" x2="0" y2="110" stroke="#DC2626" stroke-width="7"/>
 
-    <!-- Center dot -->
-    <circle cx="0" cy="0" r="8" fill="#EF4444" opacity="0.9"/>
-    <circle cx="0" cy="0" r="4" fill="#FECACA"/>
+    <!-- Corner brackets for targeting feel -->
+    <path d="M -85,-85 L -95,-85 L -95,-95 L -85,-95" stroke="#DC2626" stroke-width="5" fill="none"/>
+    <path d="M 85,-85 L 95,-85 L 95,-95 L 85,-95" stroke="#DC2626" stroke-width="5" fill="none"/>
+    <path d="M -85,85 L -95,85 L -95,95 L -85,95" stroke="#DC2626" stroke-width="5" fill="none"/>
+    <path d="M 85,85 L 95,85 L 95,95 L 85,95" stroke="#DC2626" stroke-width="5" fill="none"/>
+
+    <!-- Center dot - LARGER -->
+    <circle cx="0" cy="0" r="12" fill="#DC2626" opacity="0.95"/>
+    <circle cx="0" cy="0" r="6" fill="#FEE2E2"/>
+    <circle cx="0" cy="0" r="2" fill="#DC2626"/>
   </g>
 
   <!-- Targeting reticle at corners -->
