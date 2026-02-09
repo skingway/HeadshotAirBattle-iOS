@@ -3,11 +3,10 @@ import SwiftUI
 struct LeaderboardView: View {
     @Binding var navigationPath: NavigationPath
     @StateObject private var viewModel = LeaderboardViewModel()
+    @State private var isAppeared = false
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-
+        SciFiBgView {
             VStack(spacing: 16) {
                 // Tab selector
                 Picker("Leaderboard", selection: $viewModel.selectedTab) {
@@ -21,18 +20,25 @@ struct LeaderboardView: View {
                 if viewModel.isLoading {
                     Spacer()
                     ProgressView()
-                        .tint(.white)
+                        .tint(AppColors.accent)
                     Spacer()
                 } else if viewModel.entries.isEmpty {
                     Spacer()
                     Text("No data available")
-                        .foregroundColor(.gray)
+                        .font(AppFonts.body)
+                        .foregroundColor(AppColors.textMuted)
                     Spacer()
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 8) {
                             ForEach(Array(viewModel.entries.enumerated()), id: \.offset) { index, entry in
                                 LeaderboardRow(rank: index + 1, entry: entry, tab: viewModel.selectedTab)
+                                    .opacity(isAppeared ? 1 : 0)
+                                    .offset(x: isAppeared ? 0 : 30)
+                                    .animation(
+                                        .easeOut(duration: 0.25).delay(Double(index) * 0.06),
+                                        value: isAppeared
+                                    )
                             }
                         }
                         .padding(.horizontal)
@@ -48,6 +54,11 @@ struct LeaderboardView: View {
         .onChange(of: viewModel.selectedTab) { _ in
             Task { await viewModel.loadLeaderboard() }
         }
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.3)) {
+                isAppeared = true
+            }
+        }
     }
 }
 
@@ -59,31 +70,38 @@ struct LeaderboardRow: View {
     var body: some View {
         HStack {
             Text("#\(rank)")
-                .font(.headline)
+                .font(AppFonts.orbitron(14, weight: .bold))
                 .foregroundColor(rankColor)
                 .frame(width: 40)
 
             Text(entry.nickname)
+                .font(AppFonts.rajdhani(16, weight: .semibold))
                 .foregroundColor(.white)
 
             Spacer()
 
             Text(valueText)
-                .foregroundColor(.cyan)
-                .fontWeight(.semibold)
+                .font(AppFonts.medNumber)
+                .foregroundColor(AppColors.accent)
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 12)
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(8)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(red: 0, green: 30/255, blue: 60/255).opacity(0.3))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(rank <= 3 ? rankColor.opacity(0.3) : AppColors.borderLight, lineWidth: 1)
+        )
     }
 
     private var rankColor: Color {
         switch rank {
-        case 1: return .yellow
-        case 2: return .gray
-        case 3: return .orange
-        default: return .white
+        case 1: return AppColors.gold
+        case 2: return Color.gray
+        case 3: return AppColors.warning
+        default: return AppColors.textSecondary
         }
     }
 

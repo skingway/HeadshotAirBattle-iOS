@@ -116,6 +116,12 @@ class GameViewModel: ObservableObject {
         AudioService.shared.playBGM()
     }
 
+    // Pending attack for bomb animation
+    @Published var pendingAttackRow: Int?
+    @Published var pendingAttackCol: Int?
+    @Published var pendingAttackResultType: String?
+    @Published var showBombAnimation: Bool = false
+
     func playerAttack(row: Int, col: Int) {
         guard phase == .battle, isPlayerTurn else { return }
         guard let board = opponentBoard else { return }
@@ -125,6 +131,7 @@ class GameViewModel: ObservableObject {
 
         stopTurnTimer()
 
+        // Process attack to get result
         let result = board.processAttack(row: row, col: col)
         lastAttackResult = result.result
         totalTurns += 1
@@ -135,6 +142,24 @@ class GameViewModel: ObservableObject {
 
         // Play sound
         AudioService.shared.playSFX(for: result.result)
+
+        // Trigger bomb animation
+        pendingAttackRow = row
+        pendingAttackCol = col
+        switch result.result {
+        case .kill: pendingAttackResultType = "kill"
+        case .hit: pendingAttackResultType = "hit"
+        default: pendingAttackResultType = "miss"
+        }
+        showBombAnimation = true
+    }
+
+    func proceedAfterPlayerAttack() {
+        guard let board = opponentBoard else { return }
+
+        pendingAttackRow = nil
+        pendingAttackCol = nil
+        pendingAttackResultType = nil
 
         // Check win
         if board.areAllAirplanesDestroyed() {

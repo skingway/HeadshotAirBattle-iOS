@@ -10,11 +10,12 @@ struct CountdownView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            AppColors.bgPrimary.ignoresSafeArea()
 
             Text(count > 0 ? "\(count)" : "GO!")
-                .font(.system(size: 80, weight: .black))
-                .foregroundColor(count > 0 ? .white : .green)
+                .font(AppFonts.orbitron(80, weight: .black))
+                .foregroundColor(count > 0 ? AppColors.accent : AppColors.success)
+                .shadow(color: (count > 0 ? AppColors.accentGlow : AppColors.success).opacity(0.6), radius: 20)
                 .scaleEffect(scale)
                 .opacity(opacity)
         }

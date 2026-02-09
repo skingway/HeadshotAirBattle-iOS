@@ -4,156 +4,184 @@ struct SettingsView: View {
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var appViewModel: AppViewModel
     @StateObject private var viewModel = SettingsViewModel()
+    @State private var isAppeared = false
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-
+        SciFiBgView {
             ScrollView {
                 VStack(spacing: 24) {
                     // Audio
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Audio")
-                            .font(.headline)
-                            .foregroundColor(.cyan)
+                    CardView {
+                        VStack(alignment: .leading, spacing: 16) {
+                            SectionHeader(title: "Audio")
 
-                        Toggle("Sound Effects", isOn: $viewModel.audioEnabled)
-                            .foregroundColor(.white)
-                            .tint(.cyan)
+                            Toggle("Sound Effects", isOn: $viewModel.audioEnabled)
+                                .font(AppFonts.body)
+                                .foregroundColor(.white)
+                                .tint(AppColors.accent)
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("BGM Volume: \(Int(viewModel.bgmVolume * 100))%")
-                                .foregroundColor(.gray)
-                            Slider(value: $viewModel.bgmVolume, in: 0...1)
-                                .tint(.cyan)
-                        }
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("BGM Volume: \(Int(viewModel.bgmVolume * 100))%")
+                                    .font(AppFonts.caption)
+                                    .foregroundColor(AppColors.textSecondary)
+                                Slider(value: $viewModel.bgmVolume, in: 0...1)
+                                    .tint(AppColors.accent)
+                            }
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("SFX Volume: \(Int(viewModel.sfxVolume * 100))%")
-                                .foregroundColor(.gray)
-                            Slider(value: $viewModel.sfxVolume, in: 0...1)
-                                .tint(.cyan)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("SFX Volume: \(Int(viewModel.sfxVolume * 100))%")
+                                    .font(AppFonts.caption)
+                                    .foregroundColor(AppColors.textSecondary)
+                                Slider(value: $viewModel.sfxVolume, in: 0...1)
+                                    .tint(AppColors.accent)
+                            }
                         }
                     }
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
 
                     // Account
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Account")
-                            .font(.headline)
-                            .foregroundColor(.cyan)
+                    CardView {
+                        VStack(alignment: .leading, spacing: 12) {
+                            SectionHeader(title: "Account")
 
-                        HStack {
-                            Text("Status")
-                                .foregroundColor(.gray)
-                            Spacer()
-                            Text(appViewModel.authProviderDisplayName)
-                                .foregroundColor(.white)
-                                .fontWeight(.semibold)
-                        }
-
-                        if appViewModel.isSignedInWithApple {
-                            if let email = appViewModel.userProfile?.appleEmail {
-                                HStack {
-                                    Text("Apple ID")
-                                        .foregroundColor(.gray)
-                                    Spacer()
-                                    Text(email)
-                                        .foregroundColor(.white)
-                                        .fontWeight(.semibold)
-                                        .lineLimit(1)
-                                }
-                            }
-
-                            Button(action: {
-                                viewModel.showSignOutConfirm = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                                    Text("Sign Out")
-                                }
-                                .foregroundColor(.orange)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 10)
-                                .background(Color.orange.opacity(0.1))
-                                .cornerRadius(8)
-                            }
-                        } else if !appViewModel.isOfflineMode {
-                            Button(action: {
-                                Task {
-                                    await appViewModel.signInWithApple()
-                                }
-                            }) {
-                                HStack {
-                                    Image(systemName: "apple.logo")
-                                    Text("Sign in with Apple")
-                                }
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 10)
-                                .background(Color.white.opacity(0.15))
-                                .cornerRadius(8)
-                            }
-                        }
-
-                        Divider().overlay(Color.gray.opacity(0.3))
-
-                        Button(action: {
-                            viewModel.showDeleteConfirm = true
-                        }) {
                             HStack {
-                                Image(systemName: "trash")
-                                Text("Delete Account")
+                                Text("Status")
+                                    .font(AppFonts.body)
+                                    .foregroundColor(AppColors.textSecondary)
+                                Spacer()
+                                Text(appViewModel.authProviderDisplayName)
+                                    .font(AppFonts.medNumber)
+                                    .foregroundColor(.white)
                             }
-                            .foregroundColor(.red)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(Color.red.opacity(0.1))
-                            .cornerRadius(8)
+
+                            if appViewModel.isSignedInWithApple {
+                                if let email = appViewModel.userProfile?.appleEmail {
+                                    HStack {
+                                        Text("Apple ID")
+                                            .font(AppFonts.body)
+                                            .foregroundColor(AppColors.textSecondary)
+                                        Spacer()
+                                        Text(email)
+                                            .font(AppFonts.rajdhani(14, weight: .semibold))
+                                            .foregroundColor(.white)
+                                            .lineLimit(1)
+                                    }
+                                }
+
+                                Button(action: {
+                                    viewModel.showSignOutConfirm = true
+                                }) {
+                                    HStack {
+                                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                                        Text("Sign Out")
+                                            .font(AppFonts.buttonText)
+                                    }
+                                    .foregroundColor(AppColors.warning)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(AppColors.warning.opacity(0.1))
+                                    .cornerRadius(8)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(AppColors.warning.opacity(0.3), lineWidth: 1)
+                                    )
+                                }
+                            } else if !appViewModel.isOfflineMode {
+                                Button(action: {
+                                    Task {
+                                        await appViewModel.signInWithApple()
+                                    }
+                                }) {
+                                    HStack {
+                                        Image(systemName: "apple.logo")
+                                        Text("Sign in with Apple")
+                                            .font(AppFonts.buttonText)
+                                    }
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(Color.white.opacity(0.05))
+                                    .cornerRadius(8)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(AppColors.border, lineWidth: 1)
+                                    )
+                                }
+                            }
+
+                            // Sign-in feedback
+                            if let success = appViewModel.successMessage {
+                                Text(success)
+                                    .font(AppFonts.caption)
+                                    .foregroundColor(AppColors.success)
+                            }
+                            if let error = appViewModel.errorMessage {
+                                Text(error)
+                                    .font(AppFonts.caption)
+                                    .foregroundColor(AppColors.danger)
+                            }
+
+                            DividerLine()
+
+                            Button(action: {
+                                viewModel.showDeleteConfirm = true
+                            }) {
+                                HStack {
+                                    Image(systemName: "trash")
+                                    Text("Delete Account")
+                                        .font(AppFonts.buttonText)
+                                }
+                                .foregroundColor(AppColors.danger)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(AppColors.dangerDim)
+                                .cornerRadius(8)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(AppColors.dangerBorder, lineWidth: 1)
+                                )
+                            }
                         }
                     }
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
 
                     // Privacy & Legal
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Privacy & Legal")
-                            .font(.headline)
-                            .foregroundColor(.cyan)
+                    CardView {
+                        VStack(alignment: .leading, spacing: 12) {
+                            SectionHeader(title: "Privacy & Legal")
 
-                        Button(action: {
-                            navigationPath.append(AppRoute.privacyPolicy)
-                        }) {
-                            HStack {
-                                Text("Privacy Policy")
-                                    .foregroundColor(.white)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.gray)
+                            Button(action: {
+                                navigationPath.append(AppRoute.privacyPolicy)
+                            }) {
+                                HStack {
+                                    Text("Privacy Policy")
+                                        .font(AppFonts.body)
+                                        .foregroundColor(.white)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .foregroundColor(AppColors.textMuted)
+                                }
                             }
                         }
                     }
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
 
                     // About
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("About")
-                            .font(.headline)
-                            .foregroundColor(.cyan)
+                    CardView {
+                        VStack(alignment: .leading, spacing: 12) {
+                            SectionHeader(title: "About")
 
-                        InfoRow(label: "Version", value: "1.0.0")
-                        InfoRow(label: "Platform", value: "iOS")
+                            StatRow(label: "Version", value: "1.0.0")
+                            DividerLine()
+                            StatRow(label: "Platform", value: "iOS")
+                        }
                     }
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
                 }
                 .padding()
+                .opacity(isAppeared ? 1 : 0)
+                .offset(y: isAppeared ? 0 : 20)
+                .onAppear {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        isAppeared = true
+                    }
+                }
             }
         }
         .navigationTitle("Settings")

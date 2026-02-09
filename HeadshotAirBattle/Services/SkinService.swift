@@ -41,9 +41,9 @@ class SkinService {
         setBoardTheme("default")
     }
 
-    /// Check if a skin is unlocked (by games played or IAP purchase)
+    /// Check if a skin is unlocked (by games played, wins, or IAP purchase)
     @MainActor
-    func isSkinUnlocked(_ skin: AirplaneSkinDef, totalGames: Int) -> Bool {
+    func isSkinUnlocked(_ skin: AirplaneSkinDef, totalGames: Int, wins: Int) -> Bool {
         // Purchased Premium Skin Pack → unlock ALL skins
         if IAPService.shared.isPurchased(.premiumSkinPack) {
             return true
@@ -52,7 +52,10 @@ class SkinService {
         if skin.unlockRequirement < 0 {
             return false
         }
-        // Regular skins: unlock by games played
+        // Unlock by wins or games played based on unlockType
+        if skin.unlockType == "wins" {
+            return wins >= skin.unlockRequirement
+        }
         return totalGames >= skin.unlockRequirement
     }
 

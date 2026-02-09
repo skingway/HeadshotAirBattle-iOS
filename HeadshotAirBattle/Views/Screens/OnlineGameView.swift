@@ -6,6 +6,8 @@ struct OnlineGameView: View {
     @StateObject private var viewModel = OnlineGameViewModel()
     let gameId: String
 
+    // Bomb animation is now handled inside OnlineBattleView as an overlay on the enemy board
+
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -146,13 +148,9 @@ struct OnlineGameView: View {
                             .padding()
                         } else {
                             // 部署界面
-                            DeploymentBoardView(viewModel: viewModel.deploymentHelper)
-                                .onChange(of: viewModel.deploymentHelper.phase) { phase in
-                                    if phase == .countdown || phase == .battle {
-                                        // 用户确认了部署
-                                        viewModel.confirmDeployment()
-                                    }
-                                }
+                            DeploymentBoardView(viewModel: viewModel.deploymentHelper, onConfirmDeployment: {
+                                viewModel.confirmDeployment()
+                            })
                         }
                     }
 
@@ -196,4 +194,7 @@ struct OnlineGameView: View {
             viewModel.cleanup()
         }
     }
+
+    // calculateOnlineTargetPosition removed - bomb animation is now overlaid directly
+    // on the enemy board grid in OnlineBattleView.
 }

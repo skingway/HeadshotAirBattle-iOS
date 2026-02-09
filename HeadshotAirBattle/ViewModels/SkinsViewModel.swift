@@ -20,21 +20,25 @@ class SkinsViewModel: ObservableObject {
         UserDefaults.standard.set(themeId, forKey: GameConstants.StorageKeys.boardTheme)
     }
 
-    func isSkinUnlocked(_ skin: AirplaneSkinDef, totalGames: Int) -> Bool {
-        return SkinService.shared.isSkinUnlocked(skin, totalGames: totalGames)
+    func isSkinUnlocked(_ skin: AirplaneSkinDef, totalGames: Int, wins: Int) -> Bool {
+        return SkinService.shared.isSkinUnlocked(skin, totalGames: totalGames, wins: wins)
     }
 
     func isThemeUnlocked(_ theme: BoardThemeDef, totalWins: Int) -> Bool {
         return SkinService.shared.isThemeUnlocked(theme, wins: totalWins)
     }
 
-    func skinUnlockProgress(_ skin: AirplaneSkinDef, totalGames: Int) -> String {
-        if isSkinUnlocked(skin, totalGames: totalGames) {
+    func skinUnlockProgress(_ skin: AirplaneSkinDef, totalGames: Int, wins: Int) -> String {
+        if isSkinUnlocked(skin, totalGames: totalGames, wins: wins) {
             return "Unlocked"
         }
         // Premium skins require IAP
         if skin.unlockRequirement < 0 {
             return skin.unlockText
+        }
+        if skin.unlockType == "wins" {
+            let remaining = skin.unlockRequirement - wins
+            return "Need \(remaining) more win\(remaining == 1 ? "" : "s") or Premium Skin Pack"
         }
         let remaining = skin.unlockRequirement - totalGames
         return "Need \(remaining) more game\(remaining == 1 ? "" : "s") or Premium Skin Pack"

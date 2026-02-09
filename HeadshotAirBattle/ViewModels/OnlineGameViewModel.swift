@@ -34,10 +34,21 @@ class OnlineGameViewModel: ObservableObject {
     // Local flags to prevent Firebase observer from overwriting user actions
     private var hasClickedReadyLocally = false
     private var hasConfirmedDeploymentLocally = false
+    private var hasGameEnded = false  // Prevent duplicate history saves
+
+    // Polling fallback timer for deployment check
+    private var deploymentCheckTimer: Timer?
 
     // Track attacks for display
     @Published var myAttacks: [String: String] = [:]  // "row,col" -> "hit"/"miss"/"kill"
     @Published var opponentAttacks: [String: String] = [:]  // attacks on my board
+
+    // Bomb animation state
+    @Published var pendingAttackRow: Int?
+    @Published var pendingAttackCol: Int?
+    @Published var pendingAttackResultType: String?
+    @Published var showBombAnimation: Bool = false
+    private var pendingAttackResult: String?
 
     func joinAndListen(gameId: String, userId: String, nickname: String) {
         self.gameId = gameId
@@ -86,18 +97,16 @@ class OnlineGameViewModel: ObservableObject {
                         self.myRole = "player2"
                         self.gameRef?.child("player2").child("connected").setValue(true)
                     } else {
-                        // 我是新加入的 player2
+                        // 我是新加入的 player2 — use updateChildValues to avoid overwriting existing fields
                         self.myRole = "player2"
-                        self.gameRef?.child("player2").setValue([
+                        self.gameRef?.child("player2").updateChildValues([
                             "id": self.userId,
                             "nickname": self.nickname,
-                            "connected": true,
-                            "playerReady": false,
-                            "ready": false,  // 兼容安卓
-                            "deploymentReady": false
+                            "connected": true
                         ])
+                        // Set status to deploying (like Android's MultiplayerService.joinGame)
+                        self.gameRef?.child("status").setValue(GameConstants.OnlineGameStatus.deploying.rawValue)
                     }
-                    // 状态保持 waiting，等待双方都点击 Ready 后再进入部署阶段
                 } else {
                     // 创建新游戏，作为 player1
                     self.myRole = "player1"
@@ -129,6 +138,7 @@ class OnlineGameViewModel: ObservableObject {
 
             // 状态变化时的处理
             if oldStatus != status {
+                NSLog("[OnlineGame] Status transition: \(oldStatus.rawValue) -> \(status.rawValue), myRole=\(myRole), gameId=\(gameId)")
                 handleStatusChange(from: oldStatus, to: status, data: data)
             }
         }
@@ -212,10 +222,15 @@ class OnlineGameViewModel: ObservableObject {
             gameLog.append("Both deployed! Starting battle...")
 
             // Get player1's userId for currentTurn (Android uses userId, not role)
+            // Use atomic updateChildValues to avoid race condition with separate writes
             if let p1 = data["player1"] as? [String: Any], let p1Id = p1["id"] as? String {
-                gameRef?.child("status").setValue(GameConstants.OnlineGameStatus.battle.rawValue)
-                gameRef?.child("currentTurn").setValue(p1Id)
-                gameRef?.child("turnStartedAt").setValue(ServerValue.timestamp())
+                let battleUpdates: [String: Any] = [
+                    "status": GameConstants.OnlineGameStatus.battle.rawValue,
+                    "currentTurn": p1Id,
+                    "turnStartedAt": ServerValue.timestamp(),
+                    "battleStartedAt": ServerValue.timestamp()
+                ]
+                gameRef?.updateChildValues(battleUpdates)
                 NSLog("[OnlineGame] Battle started, first turn: \(p1Id)")
             }
         }
@@ -233,6 +248,10 @@ class OnlineGameViewModel: ObservableObject {
             // 播放背景音乐
             AudioService.shared.playBGM()
         case .finished:
+            // Prevent duplicate saves (Firebase observer may fire multiple times)
+            guard !hasGameEnded else { return }
+            hasGameEnded = true
+
             gameLog.append("Game over!")
             // 停止背景音乐，播放胜负音效和震动
             AudioService.shared.stopBGM()
@@ -303,8 +322,69 @@ class OnlineGameViewModel: ObservableObject {
 
         let winner = data["winner"] as? String ?? ""
 
+        // Build board data for battle report
+        let playerBoardData: BoardData? = {
+            guard let board = deploymentHelper.playerBoard else { return nil }
+            let airplanes = board.airplanes.map { airplane in
+                AirplaneData(
+                    id: airplane.id,
+                    headRow: airplane.headRow,
+                    headCol: airplane.headCol,
+                    direction: airplane.direction.rawValue,
+                    hits: Array(airplane.hits),
+                    isDestroyed: airplane.isDestroyed
+                )
+            }
+            let attackedCells = Array(opponentAttacks.keys)
+            let attackHistory = opponentAttacks.map { key, result -> AttackRecord in
+                let parts = key.split(separator: ",")
+                let row = Int(parts[0]) ?? 0
+                let col = Int(parts[1]) ?? 0
+                return AttackRecord(row: row, col: col, result: result)
+            }
+            return BoardData(
+                size: boardSize,
+                airplaneCount: airplaneCount,
+                airplanes: airplanes,
+                attackHistory: attackHistory,
+                attackedCells: attackedCells
+            )
+        }()
+
+        let opponentBoardData: BoardData? = {
+            guard let board = opponentBoard else { return nil }
+            let airplanes = board.airplanes.map { airplane in
+                AirplaneData(
+                    id: airplane.id,
+                    headRow: airplane.headRow,
+                    headCol: airplane.headCol,
+                    direction: airplane.direction.rawValue,
+                    hits: Array(airplane.hits),
+                    isDestroyed: airplane.isDestroyed
+                )
+            }
+            let attackedCells = Array(myAttacks.keys)
+            let attackHistory = myAttacks.map { key, result -> AttackRecord in
+                let parts = key.split(separator: ",")
+                let row = Int(parts[0]) ?? 0
+                let col = Int(parts[1]) ?? 0
+                return AttackRecord(row: row, col: col, result: result)
+            }
+            return BoardData(
+                size: boardSize,
+                airplaneCount: airplaneCount,
+                airplanes: airplanes,
+                attackHistory: attackHistory,
+                attackedCells: attackedCells
+            )
+        }()
+
+        // Use Firebase timestamps for consistent cross-platform duration
+        let firebaseCompletedAt = data["completedAt"] as? Double ?? Date().timeIntervalSince1970 * 1000
+        let battleStartedAt = data["battleStartedAt"] as? Double ?? data["createdAt"] as? Double ?? Date().timeIntervalSince1970 * 1000
+
         // 构建游戏历史记录
-        let historyEntry = GameHistoryEntry(
+        var historyEntry = GameHistoryEntry(
             id: nil,
             userId: userId,
             gameType: "online",
@@ -313,11 +393,14 @@ class OnlineGameViewModel: ObservableObject {
             boardSize: boardSize,
             airplaneCount: airplaneCount,
             totalTurns: myAttacks.count,
-            completedAt: Date().timeIntervalSince1970 * 1000,
+            completedAt: firebaseCompletedAt,
+            startedAt: battleStartedAt,
             players: [userId, opponentUserId],
             playerStats: myStats,
             aiStats: opponentStats
         )
+        historyEntry.playerBoardData = playerBoardData
+        historyEntry.aiBoardData = opponentBoardData
 
         Task {
             // 更新统计数据（包含 Leaderboard）
@@ -457,6 +540,7 @@ class OnlineGameViewModel: ObservableObject {
         hasClickedReadyLocally = true
         isPlayerReady = true
         gameLog.append("You clicked Ready (\(myRole))")
+        NSLog("[OnlineGame] clickReady: myRole=\(myRole), status=\(gameStatus.rawValue), opponentReady=\(opponentReady), gameId=\(gameId)")
         NSLog("[OnlineGame] Writing ready=true to \(myRole)")
 
         // 同时写入两个字段，兼容安卓
@@ -485,6 +569,7 @@ class OnlineGameViewModel: ObservableObject {
         hasConfirmedDeploymentLocally = true
         isDeploymentReady = true
         gameLog.append("Deployment confirmed (\(myRole))")
+        NSLog("[OnlineGame] confirmDeployment: myRole=\(myRole), status=\(gameStatus.rawValue), opponentDeploymentReady=\(opponentDeploymentReady), airplanes=\(deploymentHelper.playerBoard?.airplanes.count ?? 0)")
 
         // 保存飞机位置到 Firebase
         if let board = deploymentHelper.playerBoard {
@@ -525,10 +610,79 @@ class OnlineGameViewModel: ObservableObject {
                       let p1 = data["player1"] as? [String: Any],
                       let p1Id = p1["id"] as? String else { return }
                 Task { @MainActor in
-                    self?.gameRef?.child("status").setValue(GameConstants.OnlineGameStatus.battle.rawValue)
-                    self?.gameRef?.child("currentTurn").setValue(p1Id)
-                    self?.gameRef?.child("turnStartedAt").setValue(ServerValue.timestamp())
+                    let battleUpdates: [String: Any] = [
+                        "status": GameConstants.OnlineGameStatus.battle.rawValue,
+                        "currentTurn": p1Id,
+                        "turnStartedAt": ServerValue.timestamp(),
+                        "battleStartedAt": ServerValue.timestamp()
+                    ]
+                    self?.gameRef?.updateChildValues(battleUpdates)
                     NSLog("[OnlineGame] Battle started (immediate), first turn: \(p1Id)")
+                }
+            }
+        }
+
+        // Start polling fallback timer to check if both players deployed
+        startDeploymentCheckTimer()
+    }
+
+    /// Polling fallback: periodically check Firebase to see if both players have deployed
+    private func startDeploymentCheckTimer() {
+        deploymentCheckTimer?.invalidate()
+        NSLog("[OnlineGame] Starting deployment check polling timer")
+
+        deploymentCheckTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self = self else { return }
+                guard self.gameStatus == .deploying else {
+                    NSLog("[OnlineGame] Deployment timer: status is \(self.gameStatus.rawValue), stopping timer")
+                    self.deploymentCheckTimer?.invalidate()
+                    self.deploymentCheckTimer = nil
+                    return
+                }
+
+                // Read game state from Firebase
+                self.gameRef?.getData { error, snapshot in
+                    guard error == nil,
+                          let data = snapshot?.value as? [String: Any] else { return }
+                    Task { @MainActor in
+                        guard self.gameStatus == .deploying else { return }
+
+                        let status = data["status"] as? String ?? ""
+                        guard status == "deploying" else {
+                            // Status already changed, stop timer
+                            self.deploymentCheckTimer?.invalidate()
+                            self.deploymentCheckTimer = nil
+                            return
+                        }
+
+                        let p1 = data["player1"] as? [String: Any]
+                        let p2 = data["player2"] as? [String: Any]
+
+                        let p1Ready = (p1?["deploymentReady"] as? Bool == true) ||
+                            (p1?["ready"] as? Bool == true && p1?["board"] != nil)
+                        let p2Ready = (p2?["deploymentReady"] as? Bool == true) ||
+                            (p2?["ready"] as? Bool == true && p2?["board"] != nil)
+
+                        NSLog("[OnlineGame] Poll: p1Ready=\(p1Ready), p2Ready=\(p2Ready), status=\(status)")
+
+                        if p1Ready && p2Ready {
+                            NSLog("[OnlineGame] Poll: both deployed! Starting battle...")
+                            self.deploymentCheckTimer?.invalidate()
+                            self.deploymentCheckTimer = nil
+
+                            if let p1Id = p1?["id"] as? String {
+                                let battleUpdates: [String: Any] = [
+                                    "status": GameConstants.OnlineGameStatus.battle.rawValue,
+                                    "currentTurn": p1Id,
+                                    "turnStartedAt": ServerValue.timestamp(),
+                                    "battleStartedAt": ServerValue.timestamp()
+                                ]
+                                self.gameRef?.updateChildValues(battleUpdates)
+                                NSLog("[OnlineGame] Battle started (poll), first turn: \(p1Id)")
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -600,6 +754,24 @@ class OnlineGameViewModel: ObservableObject {
         // Record attack locally
         myAttacks[key] = result
 
+        // Trigger bomb animation
+        pendingAttackRow = row
+        pendingAttackCol = col
+        pendingAttackResultType = result
+        pendingAttackResult = result
+        showBombAnimation = true
+    }
+
+    func proceedAfterOnlineAttack() {
+        guard let result = pendingAttackResult,
+              let row = pendingAttackRow,
+              let col = pendingAttackCol else { return }
+
+        pendingAttackRow = nil
+        pendingAttackCol = nil
+        pendingAttackResultType = nil
+        pendingAttackResult = nil
+
         // Save attack to Firebase under my role (like Android does)
         let attackData: [String: Any] = [
             "row": row,
@@ -608,7 +780,7 @@ class OnlineGameViewModel: ObservableObject {
             "timestamp": ServerValue.timestamp()
         ]
 
-        gameRef?.child(myRole).child("attacks").childByAutoId().setValue(attackData) { [weak self] error, _ in
+        gameRef?.child(myRole).child("attacks").childByAutoId().setValue(attackData) { error, _ in
             if let error = error {
                 NSLog("[OnlineGame] Attack save error: \(error.localizedDescription)")
             } else {
@@ -627,7 +799,7 @@ class OnlineGameViewModel: ObservableObject {
                 "winner": userId,
                 "completedAt": ServerValue.timestamp()
             ])
-            gameLog.append("🎉 YOU WIN!")
+            gameLog.append("YOU WIN!")
             return
         }
 
@@ -704,6 +876,8 @@ class OnlineGameViewModel: ObservableObject {
     }
 
     func cleanup() {
+        deploymentCheckTimer?.invalidate()
+        deploymentCheckTimer = nil
         if let handle = observerHandle {
             gameRef?.removeObserver(withHandle: handle)
         }

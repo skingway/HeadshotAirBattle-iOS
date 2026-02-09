@@ -1,5 +1,13 @@
 import SwiftUI
 
+/// PreferenceKey to capture the enemy board grid frame in the battle coordinate space
+struct EnemyBoardFrameKey: PreferenceKey {
+    static var defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        value = nextValue()
+    }
+}
+
 struct GameView: View {
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var appViewModel: AppViewModel
@@ -8,6 +16,8 @@ struct GameView: View {
     let mode: String
     let boardSize: Int
     let airplaneCount: Int
+
+    // Bomb animation is now handled inside DualBoardView as an overlay on the enemy board
 
     var body: some View {
         ZStack {
@@ -59,6 +69,9 @@ struct GameView: View {
             )
         }
     }
+
+    // calculateTargetPosition removed - bomb animation is now overlaid directly on the
+    // enemy BoardGridView in DualBoardView, so coordinates are trivially correct.
 
     private var gameOverView: some View {
         VStack(spacing: 20) {

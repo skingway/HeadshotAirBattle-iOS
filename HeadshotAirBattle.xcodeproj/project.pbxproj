@@ -44,6 +44,8 @@
 		75F743821856D9F25D41E14D /* BoardGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7492283D514265549C5E85C8 /* BoardGridView.swift */; };
 		8B90A9E0D48F23BBB5B278DE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FA53367E2F35E765CA1077F2 /* PrivacyInfo.xcprivacy */; };
 		8C3195454A5944DF52BF34D6 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E97A5E0AECB807A7404F06E /* Extensions.swift */; };
+		AA11BB22CC33DD44EE55FF01 /* ColorUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF02 /* ColorUtils.swift */; };
+		AA11BB22CC33DD44EE55FF03 /* BombDropAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF04 /* BombDropAnimationView.swift */; };
 		8D782DDFB68B00FD8F6923B3 /* BoardManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B63DF6243004326FB546843 /* BoardManagerTests.swift */; };
 		8E8C9CAB6C1B58EF758BAEF7 /* OnlineBattleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8404FA3AAC5B592741E546 /* OnlineBattleView.swift */; };
 		8FBD61CE9EB0C2E426705ED2 /* StatisticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C4C5601007E3F18E63D6E76 /* StatisticsService.swift */; };
@@ -89,6 +91,19 @@
 		F8AAFC2FBD2D0850F8BB1131 /* DeploymentBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562CA34E621D417D16FAD02E /* DeploymentBoardView.swift */; };
 		F916F4452ADEFCE5B74F318B /* LeaderboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA09C0E5586D9B80A38B84EE /* LeaderboardViewModel.swift */; };
 		FDC14741682D061D035A86CF /* MatchmakingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA6B32CAC4278FF1C166005D /* MatchmakingViewModel.swift */; };
+		AABB001122334455667788AB /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB001122334455667788AA /* AppColors.swift */; };
+		AABB001122334455667788AD /* AppFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB001122334455667788AC /* AppFonts.swift */; };
+		AABB001122334455667788AF /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB001122334455667788AE /* Components.swift */; };
+		FONT000000000000000011 /* Orbitron-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FONT000000000000000001 /* Orbitron-Regular.ttf */; };
+		FONT000000000000000012 /* Orbitron-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FONT000000000000000002 /* Orbitron-Medium.ttf */; };
+		FONT000000000000000013 /* Orbitron-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FONT000000000000000003 /* Orbitron-SemiBold.ttf */; };
+		FONT000000000000000014 /* Orbitron-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FONT000000000000000004 /* Orbitron-Bold.ttf */; };
+		FONT000000000000000015 /* Orbitron-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FONT000000000000000005 /* Orbitron-ExtraBold.ttf */; };
+		FONT000000000000000016 /* Orbitron-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FONT000000000000000006 /* Orbitron-Black.ttf */; };
+		FONT000000000000000017 /* Rajdhani-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FONT000000000000000007 /* Rajdhani-Regular.ttf */; };
+		FONT000000000000000018 /* Rajdhani-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FONT000000000000000008 /* Rajdhani-Medium.ttf */; };
+		FONT000000000000000019 /* Rajdhani-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FONT000000000000000009 /* Rajdhani-SemiBold.ttf */; };
+		FONT00000000000000001A /* Rajdhani-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FONT00000000000000000A /* Rajdhani-Bold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,6 +133,8 @@
 		2C183F07FC2FE98ACB00CB31 /* FirebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseService.swift; sourceTree = "<group>"; };
 		2E18BE19D4BCC6E6F41F7340 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		2E97A5E0AECB807A7404F06E /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF02 /* ColorUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorUtils.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF04 /* BombDropAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BombDropAnimationView.swift; sourceTree = "<group>"; };
 		36B6BDCDB0C4DB07F9B30482 /* CellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellView.swift; sourceTree = "<group>"; };
 		3E63D7C42CE7ACDCDD3873AA /* SkinService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinService.swift; sourceTree = "<group>"; };
 		3F59563454061AC857C79FAE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -184,6 +201,19 @@
 		F25FB798EF3C2C0523CB6B84 /* RoomService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomService.swift; sourceTree = "<group>"; };
 		FA53367E2F35E765CA1077F2 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		FD5A730390BC599B80D9F196 /* AdService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdService.swift; sourceTree = "<group>"; };
+		AABB001122334455667788AA /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
+		AABB001122334455667788AC /* AppFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFonts.swift; sourceTree = "<group>"; };
+		AABB001122334455667788AE /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		FONT000000000000000001 /* Orbitron-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Orbitron-Regular.ttf; sourceTree = "<group>"; };
+		FONT000000000000000002 /* Orbitron-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Orbitron-Medium.ttf; sourceTree = "<group>"; };
+		FONT000000000000000003 /* Orbitron-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Orbitron-SemiBold.ttf; sourceTree = "<group>"; };
+		FONT000000000000000004 /* Orbitron-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Orbitron-Bold.ttf; sourceTree = "<group>"; };
+		FONT000000000000000005 /* Orbitron-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Orbitron-ExtraBold.ttf; sourceTree = "<group>"; };
+		FONT000000000000000006 /* Orbitron-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Orbitron-Black.ttf; sourceTree = "<group>"; };
+		FONT000000000000000007 /* Rajdhani-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Rajdhani-Regular.ttf; sourceTree = "<group>"; };
+		FONT000000000000000008 /* Rajdhani-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Rajdhani-Medium.ttf; sourceTree = "<group>"; };
+		FONT000000000000000009 /* Rajdhani-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Rajdhani-SemiBold.ttf; sourceTree = "<group>"; };
+		FONT00000000000000000A /* Rajdhani-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Rajdhani-Bold.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -264,6 +294,7 @@
 				BC94D6267D06A333A05F7852 /* Utilities */,
 				CEDF00A6F0C42B896DD503A1 /* ViewModels */,
 				4FE0F84433E1839D897C77E3 /* Views */,
+				THEME00000000000000001 /* Theme */,
 			);
 			path = HeadshotAirBattle;
 			sourceTree = "<group>";
@@ -351,6 +382,7 @@
 				215227CF8B449D916B94D820 /* AirplaneShapeView.swift */,
 				9381B7E0A97460D4C8D72146 /* BannerAdView.swift */,
 				7492283D514265549C5E85C8 /* BoardGridView.swift */,
+				AA11BB22CC33DD44EE55FF04 /* BombDropAnimationView.swift */,
 				36B6BDCDB0C4DB07F9B30482 /* CellView.swift */,
 				2A36ADF61CF7D6B98A929DEA /* CountdownView.swift */,
 				562CA34E621D417D16FAD02E /* DeploymentBoardView.swift */,
@@ -365,6 +397,7 @@
 		BC94D6267D06A333A05F7852 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				AA11BB22CC33DD44EE55FF02 /* ColorUtils.swift */,
 				2E97A5E0AECB807A7404F06E /* Extensions.swift */,
 			);
 			path = Utilities;
@@ -386,6 +419,7 @@
 				D58977D4E0614E9961351939 /* GoogleService-Info.plist */,
 				5731DDC35A64D28FE984D597 /* Info.plist */,
 				FA53367E2F35E765CA1077F2 /* PrivacyInfo.xcprivacy */,
+				FONTS00000000000000001 /* Fonts */,
 				1D157C7FD249AC253D0B30A2 /* Sounds */,
 			);
 			path = Resources;
@@ -407,6 +441,33 @@
 				D46FB4E16E154C0367A85342 /* SkinsViewModel.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		THEME00000000000000001 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				AABB001122334455667788AA /* AppColors.swift */,
+				AABB001122334455667788AC /* AppFonts.swift */,
+				AABB001122334455667788AE /* Components.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		FONTS00000000000000001 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				FONT000000000000000001 /* Orbitron-Regular.ttf */,
+				FONT000000000000000002 /* Orbitron-Medium.ttf */,
+				FONT000000000000000003 /* Orbitron-SemiBold.ttf */,
+				FONT000000000000000004 /* Orbitron-Bold.ttf */,
+				FONT000000000000000005 /* Orbitron-ExtraBold.ttf */,
+				FONT000000000000000006 /* Orbitron-Black.ttf */,
+				FONT000000000000000007 /* Rajdhani-Regular.ttf */,
+				FONT000000000000000008 /* Rajdhani-Medium.ttf */,
+				FONT000000000000000009 /* Rajdhani-SemiBold.ttf */,
+				FONT00000000000000000A /* Rajdhani-Bold.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -506,6 +567,16 @@
 				DB5D83BE2DEDFF1F0971C0B7 /* kill.mp3 in Resources */,
 				2D450C1C4FE874C8FEF31E8B /* miss.mp3 in Resources */,
 				4166EF193155DF0A22D11C4E /* victory.mp3 in Resources */,
+				FONT000000000000000011 /* Orbitron-Regular.ttf in Resources */,
+				FONT000000000000000012 /* Orbitron-Medium.ttf in Resources */,
+				FONT000000000000000013 /* Orbitron-SemiBold.ttf in Resources */,
+				FONT000000000000000014 /* Orbitron-Bold.ttf in Resources */,
+				FONT000000000000000015 /* Orbitron-ExtraBold.ttf in Resources */,
+				FONT000000000000000016 /* Orbitron-Black.ttf in Resources */,
+				FONT000000000000000017 /* Rajdhani-Regular.ttf in Resources */,
+				FONT000000000000000018 /* Rajdhani-Medium.ttf in Resources */,
+				FONT000000000000000019 /* Rajdhani-SemiBold.ttf in Resources */,
+				FONT00000000000000001A /* Rajdhani-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -552,6 +623,8 @@
 				554D33374A6BB408672C62E8 /* CustomModeView.swift in Sources */,
 				F8AAFC2FBD2D0850F8BB1131 /* DeploymentBoardView.swift in Sources */,
 				09737240FA41FE14EA1C6C78 /* DualBoardView.swift in Sources */,
+				AA11BB22CC33DD44EE55FF01 /* ColorUtils.swift in Sources */,
+				AA11BB22CC33DD44EE55FF03 /* BombDropAnimationView.swift in Sources */,
 				8C3195454A5944DF52BF34D6 /* Extensions.swift in Sources */,
 				DB6DE39F0787058331C67CEE /* FirebaseModels.swift in Sources */,
 				251DFE0487FB1D6EF2E9982D /* FirebaseService.swift in Sources */,
@@ -592,6 +665,9 @@
 				8FBD61CE9EB0C2E426705ED2 /* StatisticsService.swift in Sources */,
 				E065539F5642A053AD144615 /* StoreView.swift in Sources */,
 				DD8A36B0BAA1F7E28EEE3F15 /* TurnTimerView.swift in Sources */,
+				AABB001122334455667788AB /* AppColors.swift in Sources */,
+				AABB001122334455667788AD /* AppFonts.swift in Sources */,
+				AABB001122334455667788AF /* Components.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -3,84 +3,103 @@ import SwiftUI
 struct MainMenuView: View {
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var appViewModel: AppViewModel
+    @State private var floatOffset: CGFloat = 0
+    @State private var isAppeared = false
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
+        SciFiBgView {
+            VStack(spacing: 0) {
+                Spacer().frame(height: 60)
 
-            VStack(spacing: 24) {
-                Spacer()
-
-                // Title
+                // Logo
                 VStack(spacing: 8) {
                     Text("HEADSHOT")
-                        .font(.system(size: 42, weight: .black))
+                        .font(AppFonts.orbitron(26, weight: .black))
                         .foregroundColor(.white)
+
                     Text("AIR BATTLE")
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(.cyan)
+                        .font(AppFonts.orbitron(10, weight: .regular))
+                        .foregroundColor(AppColors.accent.opacity(0.6))
+                        .tracking(6)
                 }
 
-                Spacer()
+                // Floating plane icon
+                Text("\u{2708}\u{FE0F}")
+                    .font(.system(size: 80))
+                    .shadow(color: AppColors.accentGlow, radius: 20)
+                    .offset(y: floatOffset)
+                    .onAppear {
+                        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                            floatOffset = -8
+                        }
+                    }
+                    .padding(.vertical, 30)
 
                 // Menu buttons
-                VStack(spacing: 16) {
-                    MenuButton(title: "Single Player", icon: "airplane") {
+                VStack(spacing: 12) {
+                    PrimaryButton(icon: "\u{26A1}", title: "Single Player") {
                         navigationPath.append(AppRoute.singlePlayerSetup)
                     }
 
-                    MenuButton(title: "Online PvP", icon: "wifi") {
+                    SecondaryButton(icon: "\u{1F310}", title: "Online PvP") {
                         navigationPath.append(AppRoute.onlineMode)
                     }
 
-                    MenuButton(title: "Custom Mode", icon: "slider.horizontal.3") {
+                    TertiaryButton(icon: "\u{1F3AE}", title: "Custom Mode") {
                         navigationPath.append(AppRoute.customMode)
                     }
 
-                    HStack(spacing: 16) {
-                        SmallMenuButton(title: "Profile", icon: "person.fill") {
+                    HStack(spacing: 12) {
+                        SciFiSmallMenuButton(title: "Profile", icon: "person.fill") {
                             navigationPath.append(AppRoute.profile)
                         }
-                        SmallMenuButton(title: "Leaderboard", icon: "trophy.fill") {
+                        SciFiSmallMenuButton(title: "Leaderboard", icon: "trophy.fill") {
                             navigationPath.append(AppRoute.leaderboard)
                         }
                     }
 
-                    HStack(spacing: 16) {
-                        SmallMenuButton(title: "History", icon: "clock.fill") {
+                    HStack(spacing: 12) {
+                        SciFiSmallMenuButton(title: "History", icon: "clock.fill") {
                             navigationPath.append(AppRoute.gameHistory)
                         }
-                        SmallMenuButton(title: "Achievements", icon: "star.fill") {
+                        SciFiSmallMenuButton(title: "Achievements", icon: "star.fill") {
                             navigationPath.append(AppRoute.achievements)
                         }
                     }
 
-                    HStack(spacing: 16) {
-                        SmallMenuButton(title: "Skins", icon: "paintbrush.fill") {
+                    HStack(spacing: 12) {
+                        SciFiSmallMenuButton(title: "Skins", icon: "paintbrush.fill") {
                             navigationPath.append(AppRoute.skins)
                         }
-                        SmallMenuButton(title: "Store", icon: "cart.fill") {
+                        SciFiSmallMenuButton(title: "Store", icon: "cart.fill") {
                             navigationPath.append(AppRoute.store)
                         }
                     }
 
-                    SmallMenuButton(title: "Settings", icon: "gearshape.fill") {
+                    SciFiSmallMenuButton(title: "Settings", icon: "gearshape.fill") {
                         navigationPath.append(AppRoute.settings)
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 20)
 
                 Spacer()
 
                 // Welcome text
                 if appViewModel.isAuthenticated {
                     Text("Welcome, \(appViewModel.nickname)")
-                        .font(.caption)
-                        .foregroundColor(.gray)
+                        .font(AppFonts.caption)
+                        .foregroundColor(AppColors.textMuted)
                 }
 
                 // Banner ad at bottom
                 ConditionalBannerAd()
+            }
+            .opacity(isAppeared ? 1 : 0)
+            .offset(y: isAppeared ? 0 : 20)
+            .onAppear {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    isAppeared = true
+                }
             }
         }
         .navigationBarHidden(true)
@@ -96,24 +115,23 @@ struct MenuButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack {
+            HStack(spacing: 8) {
                 Image(systemName: icon)
                     .font(.title3)
-                Text(title)
-                    .font(.headline)
+                Text(title.uppercased())
+                    .font(AppFonts.buttonText)
+                    .tracking(2)
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.blue.opacity(0.3))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.blue.opacity(0.5), lineWidth: 1)
-                    )
+                    .fill(AppColors.primaryGradient)
             )
+            .shadow(color: AppColors.accentGlow.opacity(0.3), radius: 12, x: 0, y: 4)
         }
+        .buttonStyle(ScaleButtonStyle())
     }
 }
 
@@ -127,20 +145,54 @@ struct SmallMenuButton: View {
             VStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.title3)
-                Text(title)
-                    .font(.caption)
+                    .foregroundColor(AppColors.accent)
+                Text(title.uppercased())
+                    .font(AppFonts.orbitron(9, weight: .semibold))
+                    .tracking(1)
             }
-            .foregroundColor(.white)
+            .foregroundColor(AppColors.textSecondary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.gray.opacity(0.2))
+                    .fill(Color.white.opacity(0.03))
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            .stroke(AppColors.border, lineWidth: 1)
                     )
             )
         }
+        .buttonStyle(ScaleButtonStyle())
+    }
+}
+
+struct SciFiSmallMenuButton: View {
+    let title: String
+    let icon: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundColor(AppColors.accent)
+                Text(title.uppercased())
+                    .font(AppFonts.orbitron(9, weight: .semibold))
+                    .tracking(1)
+            }
+            .foregroundColor(AppColors.textSecondary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.white.opacity(0.03))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(AppColors.border, lineWidth: 1)
+                    )
+            )
+        }
+        .buttonStyle(ScaleButtonStyle())
     }
 }

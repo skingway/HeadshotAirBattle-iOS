@@ -4,38 +4,40 @@ import StoreKit
 struct StoreView: View {
     @Binding var navigationPath: NavigationPath
     @StateObject private var iapService = IAPService.shared
+    @State private var isAppeared = false
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-
+        SciFiBgView {
             ScrollView {
                 VStack(spacing: 20) {
                     // Header
                     VStack(spacing: 4) {
                         Text("STORE")
-                            .font(.system(size: 28, weight: .black))
+                            .font(AppFonts.orbitron(28, weight: .black))
                             .foregroundColor(.white)
+                            .tracking(4)
                         Text("Enhance your experience")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .font(AppFonts.body)
+                            .foregroundColor(AppColors.textSecondary)
                     }
                     .padding(.top)
 
                     if iapService.isLoading {
                         ProgressView("Loading products...")
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.textSecondary)
+                            .tint(AppColors.accent)
                             .padding(.top, 40)
                     } else if iapService.products.isEmpty {
                         VStack(spacing: 12) {
                             Image(systemName: "cart.badge.questionmark")
                                 .font(.system(size: 40))
-                                .foregroundColor(.gray)
+                                .foregroundColor(AppColors.textMuted)
                             Text("Products unavailable")
-                                .foregroundColor(.gray)
+                                .font(AppFonts.body)
+                                .foregroundColor(AppColors.textMuted)
                             Text("Please check your internet connection and try again.")
-                                .font(.caption)
-                                .foregroundColor(.gray.opacity(0.7))
+                                .font(AppFonts.caption)
+                                .foregroundColor(AppColors.textDark)
                                 .multilineTextAlignment(.center)
                         }
                         .padding(.top, 40)
@@ -74,13 +76,20 @@ struct StoreView: View {
                         }
                     }) {
                         Text("Restore Purchases")
-                            .font(.subheadline)
-                            .foregroundColor(.cyan)
+                            .font(AppFonts.rajdhani(14, weight: .semibold))
+                            .foregroundColor(AppColors.accent)
                     }
                     .padding(.top, 8)
                     .padding(.bottom, 20)
                 }
                 .padding(.horizontal)
+                .opacity(isAppeared ? 1 : 0)
+                .offset(y: isAppeared ? 0 : 20)
+                .onAppear {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        isAppeared = true
+                    }
+                }
             }
         }
         .navigationTitle("Store")
@@ -111,30 +120,24 @@ struct StoreItemView: View {
     let onPurchase: () async -> Void
 
     var body: some View {
-        VStack(spacing: 12) {
-            if isBestValue {
-                Text("BEST VALUE")
-                    .font(.caption.bold())
-                    .foregroundColor(.black)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(Color.yellow)
-                    .cornerRadius(4)
-            }
-
-            HStack(spacing: 16) {
+        VStack(spacing: 0) {
+            HStack(spacing: 14) {
                 Image(systemName: iapProduct.icon)
-                    .font(.title2)
-                    .foregroundColor(isBestValue ? .yellow : .cyan)
-                    .frame(width: 44)
+                    .font(.system(size: 20))
+                    .foregroundColor(isBestValue ? AppColors.gold : AppColors.accent)
+                    .frame(width: 44, height: 44)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(isBestValue ? AppColors.gold.opacity(0.15) : AppColors.accentDim)
+                    )
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text(iapProduct.displayName)
-                        .font(.headline)
+                        .font(AppFonts.orbitron(13, weight: .semibold))
                         .foregroundColor(.white)
                     Text(iapProduct.description)
-                        .font(.caption)
-                        .foregroundColor(.gray)
+                        .font(AppFonts.caption)
+                        .foregroundColor(AppColors.textMuted)
                         .lineLimit(2)
                 }
 
@@ -143,30 +146,48 @@ struct StoreItemView: View {
                 if isPurchased {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.title2)
-                        .foregroundColor(.green)
+                        .foregroundColor(AppColors.success)
                 } else {
                     Button(action: {
                         Task { await onPurchase() }
                     }) {
                         Text(product.displayPrice)
-                            .font(.subheadline.bold())
-                            .foregroundColor(.white)
+                            .font(AppFonts.orbitron(12, weight: .bold))
+                            .foregroundColor(isBestValue ? .black : AppColors.accent)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
-                            .background(isBestValue ? Color.yellow.opacity(0.8) : Color.blue)
-                            .cornerRadius(20)
+                            .background(
+                                Capsule()
+                                    .fill(isBestValue ? AppColors.goldGradient : LinearGradient(colors: [AppColors.accentDim, AppColors.accentDim], startPoint: .leading, endPoint: .trailing))
+                            )
+                            .overlay(
+                                isBestValue ? nil :
+                                Capsule()
+                                    .stroke(AppColors.accentBorder, lineWidth: 1)
+                            )
                     }
                 }
             }
         }
-        .padding()
+        .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.gray.opacity(0.1))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(isBestValue ? Color.yellow.opacity(0.5) : Color.clear, lineWidth: 1)
-                )
+            RoundedRectangle(cornerRadius: 14)
+                .fill(isBestValue ? AppColors.gold.opacity(0.03) : Color(red: 0, green: 30/255, blue: 60/255).opacity(0.4))
         )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(isBestValue ? AppColors.gold.opacity(0.4) : AppColors.accentBorder.opacity(0.5), lineWidth: 1)
+        )
+        .overlay(alignment: .top) {
+            if isBestValue {
+                Text("BEST VALUE")
+                    .font(AppFonts.orbitron(8, weight: .heavy))
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 3)
+                    .background(Capsule().fill(AppColors.goldGradient))
+                    .offset(y: -10)
+            }
+        }
     }
 }

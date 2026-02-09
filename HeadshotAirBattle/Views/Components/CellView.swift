@@ -7,34 +7,78 @@ struct CellView: View {
     let showAirplane: Bool
     let cellSize: CGFloat
     let themeColors: ThemeColors
+
     var onTap: (() -> Void)?
 
-    var body: some View {
-        Rectangle()
-            .fill(cellColor)
-            .frame(width: cellSize, height: cellSize)
-            .overlay(cellOverlay)
-            .overlay(
-                Rectangle()
-                    .stroke(Color(hex: themeColors.gridLine), lineWidth: 0.5)
-            )
-            .onTapGesture {
-                onTap?()
-            }
+    @State private var hitPulse: Bool = false
+
+    private var effects: CellEffects {
+        ColorUtils.generateCellEffects(from: themeColors)
     }
 
-    private var cellColor: Color {
+    var body: some View {
+        ZStack {
+            cellBackground
+            cellOverlay
+        }
+        .frame(width: cellSize, height: cellSize)
+        .overlay(
+            Rectangle()
+                .stroke(Color(hex: themeColors.gridLine), lineWidth: 0.5)
+        )
+        .onTapGesture {
+            onTap?()
+        }
+    }
+
+    @ViewBuilder
+    private var cellBackground: some View {
         switch state {
         case .empty:
-            return Color(hex: themeColors.cellEmpty)
+            Rectangle()
+                .fill(effects.empty.baseColor)
+
         case .airplane:
-            return showAirplane ? Color(hex: themeColors.cellAirplane) : Color(hex: themeColors.cellEmpty)
+            if showAirplane {
+                LinearGradient(
+                    colors: [effects.airplane.gradient.start, effects.airplane.gradient.end],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .shadow(color: effects.airplane.glowColor, radius: 3, x: 0, y: 0)
+            } else {
+                Rectangle()
+                    .fill(effects.empty.baseColor)
+            }
+
         case .hit:
-            return Color(hex: themeColors.cellHit)
+            LinearGradient(
+                colors: [effects.hit.gradient.start, effects.hit.gradient.end],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .overlay(
+                Rectangle()
+                    .fill(effects.hit.pulseColor)
+                    .opacity(hitPulse ? 0.6 : 0.0)
+            )
+            .onAppear {
+                withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                    hitPulse = true
+                }
+            }
+
         case .miss:
-            return Color(hex: themeColors.cellMiss)
+            Rectangle()
+                .fill(effects.miss.baseColor)
+
         case .killed:
-            return Color(hex: themeColors.cellKilled)
+            LinearGradient(
+                colors: [effects.killed.gradient.start, effects.killed.gradient.end],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .shadow(color: effects.killed.glowColor, radius: 4, x: 0, y: 0)
         }
     }
 
@@ -45,18 +89,24 @@ struct CellView: View {
             Image(systemName: "flame.fill")
                 .font(.system(size: cellSize * 0.5))
                 .foregroundColor(.orange)
+                .shadow(color: effects.hit.glowColor, radius: 3)
+
         case .miss:
             Circle()
-                .fill(Color.white.opacity(0.3))
-                .frame(width: cellSize * 0.3, height: cellSize * 0.3)
+                .fill(effects.miss.dotColor)
+                .frame(width: cellSize * 0.25, height: cellSize * 0.25)
+
         case .killed:
             Image(systemName: "xmark")
                 .font(.system(size: cellSize * 0.6, weight: .bold))
-                .foregroundColor(.white)
+                .foregroundColor(effects.killed.xColor)
+                .shadow(color: effects.killed.glowColor, radius: 4)
+
         case .airplane where showAirplane:
             Circle()
                 .fill(Color(hex: SkinDefinitions.currentSkinColor()))
                 .frame(width: cellSize * 0.6, height: cellSize * 0.6)
+
         default:
             EmptyView()
         }

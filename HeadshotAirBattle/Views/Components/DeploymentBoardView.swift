@@ -3,6 +3,7 @@ import SwiftUI
 /// Board view for airplane deployment phase
 struct DeploymentBoardView: View {
     @ObservedObject var viewModel: GameViewModel
+    var onConfirmDeployment: (() -> Void)?
     @State private var selectedDirection: GameConstants.Direction = .up
     @State private var isDragging = false
     @State private var dragHeadRow: Int = -1
@@ -120,6 +121,7 @@ struct DeploymentBoardView: View {
                 if viewModel.isDeploymentComplete() {
                     Button("Start Battle") {
                         viewModel.confirmDeployment()
+                        onConfirmDeployment?()
                     }
                     .font(.headline)
                     .buttonStyle(.borderedProminent)

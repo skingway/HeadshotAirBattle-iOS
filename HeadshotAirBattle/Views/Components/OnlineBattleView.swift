@@ -12,6 +12,15 @@ struct OnlineBattleView: View {
         horizontalSizeClass == .regular && verticalSizeClass == .compact
     }
 
+    // Calculate enemy board cell size (must match OnlineBoardGridView's calculation)
+    private var onlineEnemyCellSize: CGFloat {
+        let boardSize = viewModel.deploymentHelper.playerBoard?.size ?? 10
+        let screenWidth = UIScreen.main.bounds.width
+        let availableWidth = screenWidth - 60
+        let size = availableWidth / CGFloat(boardSize)
+        return min(max(size, 20), 35)
+    }
+
     var body: some View {
         Group {
             if isLandscape {
@@ -55,6 +64,27 @@ struct OnlineBattleView: View {
                     isOpponentBoard: true,
                     isInteractive: viewModel.isMyTurn,
                     themeColors: themeColors
+                )
+                .overlay(
+                    Group {
+                        if viewModel.showBombAnimation,
+                           let row = viewModel.pendingAttackRow,
+                           let col = viewModel.pendingAttackCol,
+                           let resultType = viewModel.pendingAttackResultType {
+                            let cellSize = onlineEnemyCellSize
+                            BombDropAnimationView(
+                                isPlaying: $viewModel.showBombAnimation,
+                                targetPosition: CGPoint(
+                                    x: 20 + CGFloat(col) * cellSize + cellSize / 2,
+                                    y: 14 + CGFloat(row) * cellSize + cellSize / 2
+                                ),
+                                resultType: resultType,
+                                onComplete: {
+                                    viewModel.proceedAfterOnlineAttack()
+                                }
+                            )
+                        }
+                    }
                 )
             }
 
@@ -154,13 +184,37 @@ struct OnlineBattleView: View {
                         }
                         .padding(.horizontal, 8)
 
+                        let olMaxWidth = (geometry.size.width - 24) / 2
+                        let olMaxHeight = geometry.size.height - 50
+                        let olBoardSize = viewModel.deploymentHelper.playerBoard?.size ?? 10
+                        let olCellSize = min(olMaxWidth / CGFloat(olBoardSize), olMaxHeight / CGFloat(olBoardSize), 30)
                         OnlineLandscapeBoardGridView(
                             viewModel: viewModel,
                             isOpponentBoard: true,
                             isInteractive: viewModel.isMyTurn,
                             themeColors: themeColors,
-                            maxWidth: (geometry.size.width - 24) / 2,
-                            maxHeight: geometry.size.height - 50
+                            maxWidth: olMaxWidth,
+                            maxHeight: olMaxHeight
+                        )
+                        .overlay(
+                            Group {
+                                if viewModel.showBombAnimation,
+                                   let row = viewModel.pendingAttackRow,
+                                   let col = viewModel.pendingAttackCol,
+                                   let resultType = viewModel.pendingAttackResultType {
+                                    BombDropAnimationView(
+                                        isPlaying: $viewModel.showBombAnimation,
+                                        targetPosition: CGPoint(
+                                            x: CGFloat(col) * olCellSize + olCellSize / 2,
+                                            y: CGFloat(row) * olCellSize + olCellSize / 2
+                                        ),
+                                        resultType: resultType,
+                                        onComplete: {
+                                            viewModel.proceedAfterOnlineAttack()
+                                        }
+                                    )
+                                }
+                            }
                         )
                     }
 
@@ -284,6 +338,12 @@ struct OnlineCellView: View {
     let cellSize: CGFloat
     let themeColors: ThemeColors
 
+    @State private var hitPulse: Bool = false
+
+    private var effects: CellEffects {
+        ColorUtils.generateCellEffects(from: themeColors)
+    }
+
     private var cellKey: String {
         "\(row),\(col)"
     }
@@ -298,9 +358,7 @@ struct OnlineCellView: View {
 
     var body: some View {
         ZStack {
-            // Background - color based on attack result
-            Rectangle()
-                .fill(backgroundColor)
+            cellBackground
 
             // Show airplane for own board
             if !isOpponentBoard {
@@ -323,20 +381,47 @@ struct OnlineCellView: View {
         )
     }
 
-    private var backgroundColor: Color {
+    @ViewBuilder
+    private var cellBackground: some View {
         if let result = attackResult {
             switch result {
             case "hit":
-                return Color.orange.opacity(0.5)
+                LinearGradient(
+                    colors: [effects.hit.gradient.start, effects.hit.gradient.end],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .overlay(
+                    Rectangle()
+                        .fill(effects.hit.pulseColor)
+                        .opacity(hitPulse ? 0.6 : 0.0)
+                )
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                        hitPulse = true
+                    }
+                }
+
             case "kill":
-                return Color.red.opacity(0.6)
+                LinearGradient(
+                    colors: [effects.killed.gradient.start, effects.killed.gradient.end],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .shadow(color: effects.killed.glowColor, radius: 4, x: 0, y: 0)
+
             case "miss":
-                return Color.blue.opacity(0.3)
+                Rectangle()
+                    .fill(effects.miss.baseColor)
+
             default:
-                return Color(hex: themeColors.cellEmpty)
+                Rectangle()
+                    .fill(effects.empty.baseColor)
             }
+        } else {
+            Rectangle()
+                .fill(effects.empty.baseColor)
         }
-        return Color(hex: themeColors.cellEmpty)
     }
 
     @ViewBuilder
@@ -346,14 +431,19 @@ struct OnlineCellView: View {
             Image(systemName: "flame.fill")
                 .font(.system(size: cellSize * 0.5))
                 .foregroundColor(.orange)
+                .shadow(color: effects.hit.glowColor, radius: 3)
+
         case "kill":
-            Image(systemName: "xmark.circle.fill")
-                .font(.system(size: cellSize * 0.6))
-                .foregroundColor(.red)
+            Image(systemName: "xmark")
+                .font(.system(size: cellSize * 0.6, weight: .bold))
+                .foregroundColor(effects.killed.xColor)
+                .shadow(color: effects.killed.glowColor, radius: 4)
+
         case "miss":
             Circle()
-                .fill(Color.white.opacity(0.8))
-                .frame(width: cellSize * 0.3, height: cellSize * 0.3)
+                .fill(effects.miss.dotColor)
+                .frame(width: cellSize * 0.25, height: cellSize * 0.25)
+
         default:
             EmptyView()
         }
@@ -405,6 +495,12 @@ struct OnlineSmallCellView: View {
     let cellSize: CGFloat
     let themeColors: ThemeColors
 
+    @State private var hitPulse: Bool = false
+
+    private var effects: CellEffects {
+        ColorUtils.generateCellEffects(from: themeColors)
+    }
+
     private var cellKey: String {
         "\(row),\(col)"
     }
@@ -421,6 +517,20 @@ struct OnlineSmallCellView: View {
         ZStack {
             Rectangle()
                 .fill(backgroundColor)
+                .overlay(
+                    attackResult == "hit" ?
+                    Rectangle()
+                        .fill(effects.hit.pulseColor)
+                        .opacity(hitPulse ? 0.5 : 0.0)
+                    : nil
+                )
+                .onAppear {
+                    if attackResult == "hit" {
+                        withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                            hitPulse = true
+                        }
+                    }
+                }
 
             // Show airplane for own board
             if !isOpponentBoard {
@@ -447,16 +557,16 @@ struct OnlineSmallCellView: View {
         if let result = attackResult {
             switch result {
             case "hit":
-                return Color.orange.opacity(0.5)
+                return Color(hex: themeColors.cellHit)
             case "kill":
-                return Color.red.opacity(0.6)
+                return Color(hex: themeColors.cellKilled)
             case "miss":
-                return Color.blue.opacity(0.3)
+                return effects.miss.baseColor
             default:
-                return Color(hex: themeColors.cellEmpty)
+                return effects.empty.baseColor
             }
         }
-        return Color(hex: themeColors.cellEmpty)
+        return effects.empty.baseColor
     }
 
     @ViewBuilder
@@ -466,14 +576,16 @@ struct OnlineSmallCellView: View {
             Circle()
                 .fill(Color.orange)
                 .frame(width: cellSize * 0.5, height: cellSize * 0.5)
+                .shadow(color: effects.hit.glowColor, radius: 2)
         case "kill":
-            Image(systemName: "xmark.circle.fill")
-                .font(.system(size: cellSize * 0.6))
-                .foregroundColor(.red)
+            Image(systemName: "xmark")
+                .font(.system(size: cellSize * 0.5, weight: .bold))
+                .foregroundColor(effects.killed.xColor)
+                .shadow(color: effects.killed.glowColor, radius: 2)
         case "miss":
             Circle()
-                .fill(Color.white.opacity(0.8))
-                .frame(width: cellSize * 0.3, height: cellSize * 0.3)
+                .fill(effects.miss.dotColor)
+                .frame(width: cellSize * 0.25, height: cellSize * 0.25)
         default:
             EmptyView()
         }
@@ -534,6 +646,12 @@ struct OnlineLandscapeCellView: View {
     let cellSize: CGFloat
     let themeColors: ThemeColors
 
+    @State private var hitPulse: Bool = false
+
+    private var effects: CellEffects {
+        ColorUtils.generateCellEffects(from: themeColors)
+    }
+
     private var cellKey: String {
         "\(row),\(col)"
     }
@@ -548,8 +666,7 @@ struct OnlineLandscapeCellView: View {
 
     var body: some View {
         ZStack {
-            Rectangle()
-                .fill(backgroundColor)
+            cellBackground
 
             // Show airplane for own board
             if !isOpponentBoard {
@@ -572,20 +689,47 @@ struct OnlineLandscapeCellView: View {
         )
     }
 
-    private var backgroundColor: Color {
+    @ViewBuilder
+    private var cellBackground: some View {
         if let result = attackResult {
             switch result {
             case "hit":
-                return Color.orange.opacity(0.5)
+                LinearGradient(
+                    colors: [effects.hit.gradient.start, effects.hit.gradient.end],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .overlay(
+                    Rectangle()
+                        .fill(effects.hit.pulseColor)
+                        .opacity(hitPulse ? 0.6 : 0.0)
+                )
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                        hitPulse = true
+                    }
+                }
+
             case "kill":
-                return Color.red.opacity(0.6)
+                LinearGradient(
+                    colors: [effects.killed.gradient.start, effects.killed.gradient.end],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .shadow(color: effects.killed.glowColor, radius: 4, x: 0, y: 0)
+
             case "miss":
-                return Color.blue.opacity(0.3)
+                Rectangle()
+                    .fill(effects.miss.baseColor)
+
             default:
-                return Color(hex: themeColors.cellEmpty)
+                Rectangle()
+                    .fill(effects.empty.baseColor)
             }
+        } else {
+            Rectangle()
+                .fill(effects.empty.baseColor)
         }
-        return Color(hex: themeColors.cellEmpty)
     }
 
     @ViewBuilder
@@ -595,14 +739,19 @@ struct OnlineLandscapeCellView: View {
             Image(systemName: "flame.fill")
                 .font(.system(size: cellSize * 0.5))
                 .foregroundColor(.orange)
+                .shadow(color: effects.hit.glowColor, radius: 3)
+
         case "kill":
-            Image(systemName: "xmark.circle.fill")
-                .font(.system(size: cellSize * 0.6))
-                .foregroundColor(.red)
+            Image(systemName: "xmark")
+                .font(.system(size: cellSize * 0.6, weight: .bold))
+                .foregroundColor(effects.killed.xColor)
+                .shadow(color: effects.killed.glowColor, radius: 4)
+
         case "miss":
             Circle()
-                .fill(Color.white.opacity(0.8))
-                .frame(width: cellSize * 0.3, height: cellSize * 0.3)
+                .fill(effects.miss.dotColor)
+                .frame(width: cellSize * 0.25, height: cellSize * 0.25)
+
         default:
             EmptyView()
         }

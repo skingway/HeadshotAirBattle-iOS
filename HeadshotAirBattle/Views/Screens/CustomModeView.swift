@@ -6,66 +6,76 @@ struct CustomModeView: View {
     @State private var airplaneCount: Double = 3
     @State private var difficulty = "easy"
     @State private var validationMessage: String?
+    @State private var isAppeared = false
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-
+        SciFiBgView {
             ScrollView {
                 VStack(spacing: 24) {
-                    Text("Custom Mode")
-                        .font(.title.bold())
+                    Text("CUSTOM MODE")
+                        .font(AppFonts.orbitron(22, weight: .bold))
                         .foregroundColor(.white)
+                        .tracking(3)
 
                     // Board size
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Board Size: \(Int(boardSize))x\(Int(boardSize))")
-                            .foregroundColor(.white)
-                        Slider(value: $boardSize, in: 10...20, step: 1)
-                            .tint(.cyan)
+                    CardView {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Board Size: \(Int(boardSize))\u{00D7}\(Int(boardSize))")
+                                .font(AppFonts.rajdhani(16, weight: .semibold))
+                                .foregroundColor(.white)
+                            Slider(value: $boardSize, in: 10...20, step: 1)
+                                .tint(AppColors.accent)
+                        }
                     }
 
                     // Airplane count
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Airplanes: \(Int(airplaneCount))")
-                            .foregroundColor(.white)
-                        Slider(value: $airplaneCount, in: 1...10, step: 1)
-                            .tint(.cyan)
+                    CardView {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Airplanes: \(Int(airplaneCount))")
+                                .font(AppFonts.rajdhani(16, weight: .semibold))
+                                .foregroundColor(.white)
+                            Slider(value: $airplaneCount, in: 1...10, step: 1)
+                                .tint(AppColors.accent)
+                        }
                     }
 
                     // Difficulty
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Difficulty")
-                            .foregroundColor(.white)
-                        Picker("Difficulty", selection: $difficulty) {
-                            Text("Easy").tag("easy")
-                            Text("Medium").tag("medium")
-                            Text("Hard").tag("hard")
+                    CardView {
+                        VStack(alignment: .leading, spacing: 8) {
+                            SectionHeader(title: "Difficulty")
+                            Picker("Difficulty", selection: $difficulty) {
+                                Text("Easy").tag("easy")
+                                Text("Medium").tag("medium")
+                                Text("Hard").tag("hard")
+                            }
+                            .pickerStyle(.segmented)
+                            .colorScheme(.dark)
                         }
-                        .pickerStyle(.segmented)
                     }
 
                     // Validation
                     if let message = validationMessage {
                         Text(message)
-                            .font(.caption)
-                            .foregroundColor(.orange)
+                            .font(AppFonts.caption)
+                            .foregroundColor(AppColors.warning)
                             .multilineTextAlignment(.center)
                     }
 
                     // Start button
-                    Button(action: startGame) {
-                        Text("Start Game")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue)
-                            .cornerRadius(12)
+                    PrimaryButton(icon: "\u{26A1}", title: "Start Game") {
+                        startGame()
                     }
                     .disabled(validationMessage != nil)
+                    .opacity(validationMessage != nil ? 0.5 : 1)
                 }
                 .padding()
+                .opacity(isAppeared ? 1 : 0)
+                .offset(y: isAppeared ? 0 : 20)
+                .onAppear {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        isAppeared = true
+                    }
+                }
             }
         }
         .navigationBarTitleDisplayMode(.inline)

@@ -8,56 +8,66 @@ struct OnlineModeView: View {
     @State private var isCreatingRoom = false
     @State private var isJoiningRoom = false
     @State private var errorMessage: String?
+    @State private var isAppeared = false
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-
+        SciFiBgView {
             VStack(spacing: 24) {
-                Text("Online Mode")
-                    .font(.title.bold())
+                Text("ONLINE MODE")
+                    .font(AppFonts.pageTitle)
                     .foregroundColor(.white)
+                    .tracking(2)
 
                 // Offline mode warning
                 if appViewModel.isOfflineMode {
                     Text("Online features require internet connection")
-                        .font(.caption)
-                        .foregroundColor(.orange)
+                        .font(AppFonts.caption)
+                        .foregroundColor(AppColors.warning)
                         .padding()
-                        .background(Color.orange.opacity(0.1))
-                        .cornerRadius(8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(AppColors.warning.opacity(0.1))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(AppColors.warning.opacity(0.3), lineWidth: 1)
+                        )
                 }
 
                 Spacer()
 
-                VStack(spacing: 16) {
-                    // Quick Match
-                    MenuButton(title: "Quick Match", icon: "bolt.fill") {
+                VStack(spacing: 14) {
+                    PrimaryButton(icon: "\u{26A1}", title: "Quick Match") {
                         navigationPath.append(AppRoute.matchmaking(mode: "standard"))
                     }
 
-                    // Create Room
-                    MenuButton(title: "Create Room", icon: "plus.circle.fill") {
+                    SecondaryButton(icon: "\u{2795}", title: "Create Room") {
                         Task { await createRoom() }
                     }
                     .disabled(isCreatingRoom || appViewModel.isOfflineMode)
                     .overlay(
-                        isCreatingRoom ? ProgressView().tint(.white) : nil
+                        isCreatingRoom ? ProgressView().tint(AppColors.accent) : nil
                     )
 
-                    // Join Room
-                    MenuButton(title: "Join Room", icon: "arrow.right.circle.fill") {
+                    TertiaryButton(icon: "\u{27A1}\u{FE0F}", title: "Join Room") {
                         showJoinRoom = true
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 20)
 
                 Spacer()
 
                 if let error = errorMessage {
                     Text(error)
-                        .font(.caption)
-                        .foregroundColor(.red)
+                        .font(AppFonts.caption)
+                        .foregroundColor(AppColors.danger)
+                }
+            }
+            .opacity(isAppeared ? 1 : 0)
+            .offset(y: isAppeared ? 0 : 20)
+            .onAppear {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    isAppeared = true
                 }
             }
         }
@@ -122,7 +132,6 @@ struct OnlineModeView: View {
             )
 
             await MainActor.run {
-                // 加入房间后也去 RoomLobbyView，显示 Ready 按钮
                 navigationPath.append(AppRoute.roomLobby(gameId: gameId, roomCode: code))
             }
         } catch {

@@ -10,15 +10,7 @@ Android version (React Native): https://github.com/skingway/HeadshotAirBattle
 
 ## Build & Install
 
-```bash
-# Build
-xcodebuild -project HeadshotAirBattle.xcodeproj -scheme HeadshotAirBattle \
-  -destination 'platform=iOS,id=00008101-000600E601A1001E' -allowProvisioningUpdates
-
-# Install
-ios-deploy --bundle "/Users/wangsisi/Library/Developer/Xcode/DerivedData/HeadshotAirBattle-fihvvnxrsthoknccbeewdozoygpc/Build/Products/Debug-iphoneos/HeadshotAirBattle.app" \
-  --id 00008101-000600E601A1001E
-```
+见下方 **Device Info** 中的最新命令。
 
 ---
 
@@ -153,13 +145,42 @@ waiting → deploying → battle → finished
 - Stats: Stored under `{role}/stats` with hits/misses/kills
 
 ### Device Info
-- Test device ID: `00008101-000600E601A1001E` (device name: sisi)
+
+| 设备名 | 型号 | Device ID | 安装状态 |
+|--------|------|-----------|----------|
+| sisi | iPhone 12 Pro Max | `00008101-000600E601A1001E` | 已安装 (2026-02-07) |
+| wang的iPhone | iPhone 15 Plus | `00008120-000E10AA0A01A01E` | 已安装 (2026-02-07) |
+| 𝓑𝓪𝓸𝓫𝓪𝓸𝓽𝓪 | iPhone XS Max | `00008020-001635D614C2002E` | 待安装 (设备离线) |
+
 - Min iOS version: 16.0
 - Build target: arm64
+- Signing: Automatic (Team: 8J6A847P66, Apple Development: Sisi Wang)
+- 支持 Wi-Fi 无线安装（设备需在同一网络且已配对）
+
+### Build & Install Commands
+```bash
+# 构建（自动注册新设备）
+xcodebuild -project HeadshotAirBattle.xcodeproj -scheme HeadshotAirBattle \
+  -destination 'platform=iOS,id=<DEVICE_UDID>' \
+  -allowProvisioningUpdates -allowProvisioningDeviceRegistration build
+
+# 无线安装到指定设备
+xcrun devicectl device install app --device <DEVICE_UDID> \
+  /Users/wangsisi/Library/Developer/Xcode/DerivedData/HeadshotAirBattle-fihvvnxrsthoknccbeewdozoygpc/Build/Products/Debug-iphoneos/HeadshotAirBattle.app
+
+# 查看已连接设备
+xcrun devicectl list devices
+```
 
 ---
 
 ## Recent Changes
+
+### 2026-02-07 (Device Installation)
+1. **注册 iPhone 15 Plus 到开发者账号** - 使用 `-allowProvisioningDeviceRegistration` 自动注册新设备
+2. **无线安装到 iPhone 15 Plus** - 通过 Wi-Fi 使用 `xcrun devicectl` 安装成功
+3. **无线安装到 iPhone 12 Pro Max (sisi)** - 通过 Wi-Fi 安装成功
+4. **iPhone XS Max (𝓑𝓪𝓸𝓫𝓪𝓸𝓽𝓪) 待安装** - 设备离线，下次更新时一并安装
 
 ### 2026-02-07 (Final Update)
 1. **Added online game achievements** - Achievement system now triggers for online games (first win, sharpshooter, prophet, etc.)

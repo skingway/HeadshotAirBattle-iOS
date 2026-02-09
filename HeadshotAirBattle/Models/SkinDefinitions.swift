@@ -5,6 +5,7 @@ struct AirplaneSkinDef: Identifiable {
     let name: String
     let description: String
     let unlockRequirement: Int
+    let unlockType: String // "games" or "wins"
     let unlockText: String
     let color: String // Hex color
 }
@@ -32,38 +33,38 @@ struct BoardThemeDef: Identifiable {
 enum SkinDefinitions {
     static let airplaneSkins: [AirplaneSkinDef] = [
         AirplaneSkinDef(id: "blue", name: "Classic Blue", description: "The original blue fighter",
-                        unlockRequirement: 0, unlockText: "Default", color: "#3498db"),
+                        unlockRequirement: 0, unlockType: "games", unlockText: "Default", color: "#3498db"),
         AirplaneSkinDef(id: "red", name: "Crimson Red", description: "Fierce red warrior",
-                        unlockRequirement: 5, unlockText: "Play 5 games", color: "#e74c3c"),
+                        unlockRequirement: 5, unlockType: "games", unlockText: "Play 5 games", color: "#e74c3c"),
         AirplaneSkinDef(id: "green", name: "Forest Green", description: "Stealth green ops",
-                        unlockRequirement: 10, unlockText: "Play 10 games", color: "#2ecc71"),
+                        unlockRequirement: 10, unlockType: "games", unlockText: "Play 10 games", color: "#2ecc71"),
         AirplaneSkinDef(id: "purple", name: "Royal Purple", description: "Majestic purple jet",
-                        unlockRequirement: 15, unlockText: "Play 15 games", color: "#9b59b6"),
+                        unlockRequirement: 15, unlockType: "games", unlockText: "Play 15 games", color: "#9b59b6"),
         AirplaneSkinDef(id: "orange", name: "Sunset Orange", description: "Blazing orange flame",
-                        unlockRequirement: 20, unlockText: "Play 20 games", color: "#f39c12"),
+                        unlockRequirement: 20, unlockType: "games", unlockText: "Play 20 games", color: "#f39c12"),
         AirplaneSkinDef(id: "pink", name: "Hot Pink", description: "Vibrant pink power",
-                        unlockRequirement: 25, unlockText: "Play 25 games", color: "#ec4899"),
+                        unlockRequirement: 25, unlockType: "games", unlockText: "Play 25 games", color: "#ec4899"),
         AirplaneSkinDef(id: "cyan", name: "Aqua Cyan", description: "Cool cyan skies",
-                        unlockRequirement: 30, unlockText: "Play 30 games", color: "#00bcd4"),
+                        unlockRequirement: 30, unlockType: "games", unlockText: "Play 30 games", color: "#00bcd4"),
         AirplaneSkinDef(id: "yellow", name: "Golden Yellow", description: "Brilliant gold shine",
-                        unlockRequirement: 40, unlockText: "Play 40 games", color: "#f1c40f"),
+                        unlockRequirement: 40, unlockType: "games", unlockText: "Play 40 games", color: "#f1c40f"),
         AirplaneSkinDef(id: "teal", name: "Teal Wave", description: "Ocean teal fighter",
-                        unlockRequirement: 50, unlockText: "Win 10 games", color: "#1abc9c"),
+                        unlockRequirement: 10, unlockType: "wins", unlockText: "Win 10 games", color: "#1abc9c"),
         AirplaneSkinDef(id: "indigo", name: "Deep Indigo", description: "Midnight indigo sky",
-                        unlockRequirement: 60, unlockText: "Win 20 games", color: "#3f51b5"),
+                        unlockRequirement: 20, unlockType: "wins", unlockText: "Win 20 games", color: "#3f51b5"),
         AirplaneSkinDef(id: "lime", name: "Neon Lime", description: "Electric lime green",
-                        unlockRequirement: 70, unlockText: "Win 30 games", color: "#8bc34a"),
+                        unlockRequirement: 30, unlockType: "wins", unlockText: "Win 30 games", color: "#8bc34a"),
         AirplaneSkinDef(id: "rose", name: "Rose Gold", description: "Elegant rose gold",
-                        unlockRequirement: 100, unlockText: "Win 50 games", color: "#ff6b9d"),
+                        unlockRequirement: 50, unlockType: "wins", unlockText: "Win 50 games", color: "#ff6b9d"),
         // Premium skins (IAP only)
-        AirplaneSkinDef(id: "diamond", name: "Diamond", description: "Brilliant diamond sparkle",
-                        unlockRequirement: -1, unlockText: "Premium Skin Pack", color: "#b9f2ff"),
-        AirplaneSkinDef(id: "stealth", name: "Stealth", description: "Invisible stealth fighter",
-                        unlockRequirement: -1, unlockText: "Premium Skin Pack", color: "#2d2d2d"),
-        AirplaneSkinDef(id: "flame", name: "Flame", description: "Blazing inferno wings",
-                        unlockRequirement: -1, unlockText: "Premium Skin Pack", color: "#ff4500"),
-        AirplaneSkinDef(id: "aurora", name: "Aurora", description: "Northern lights shimmer",
-                        unlockRequirement: -1, unlockText: "Premium Skin Pack", color: "#00ff88"),
+        AirplaneSkinDef(id: "diamond", name: "Diamond Blue", description: "Brilliant diamond sparkle",
+                        unlockRequirement: -1, unlockType: "premium", unlockText: "Premium Skin Pack", color: "#b9f2ff"),
+        AirplaneSkinDef(id: "stealth", name: "Stealth Black", description: "Invisible stealth fighter",
+                        unlockRequirement: -1, unlockType: "premium", unlockText: "Premium Skin Pack", color: "#2c2c2c"),
+        AirplaneSkinDef(id: "flame", name: "Flame Red", description: "Blazing inferno wings",
+                        unlockRequirement: -1, unlockType: "premium", unlockText: "Premium Skin Pack", color: "#ff4500"),
+        AirplaneSkinDef(id: "aurora", name: "Aurora Green", description: "Northern lights shimmer",
+                        unlockRequirement: -1, unlockType: "premium", unlockText: "Premium Skin Pack", color: "#00ff88"),
     ]
 
     static let boardThemes: [BoardThemeDef] = [
@@ -106,16 +107,16 @@ enum SkinDefinitions {
         // Premium themes (IAP only)
         BoardThemeDef(id: "neon_city", name: "Neon City", description: "Cyberpunk neon lights", icon: "🏙️",
                       unlockRequirement: -1, unlockText: "Premium Theme Pack",
-                      colors: ThemeColors(cellEmpty: "#0a0020", cellAirplane: "#ff00ff", cellHit: "#00ffff",
-                                         cellMiss: "#1a0040", cellKilled: "#ff0080", gridLine: "#2a0060", background: "#050010")),
+                      colors: ThemeColors(cellEmpty: "#0d0d1a", cellAirplane: "#00ffff", cellHit: "#ff00ff",
+                                         cellMiss: "#1a1a3e", cellKilled: "#ff0055", gridLine: "#1a1a40", background: "#050510")),
         BoardThemeDef(id: "cherry_blossom", name: "Cherry Blossom", description: "Japanese spring garden", icon: "🌸",
                       unlockRequirement: -1, unlockText: "Premium Theme Pack",
-                      colors: ThemeColors(cellEmpty: "#2a1520", cellAirplane: "#ff69b4", cellHit: "#ff1744",
-                                         cellMiss: "#8b4563", cellKilled: "#d50032", gridLine: "#3d2030", background: "#1a0a10")),
+                      colors: ThemeColors(cellEmpty: "#2d1a25", cellAirplane: "#ffb7c5", cellHit: "#ff6b81",
+                                         cellMiss: "#8b5e6b", cellKilled: "#e63956", gridLine: "#4a2a3a", background: "#1a0f15")),
         BoardThemeDef(id: "midnight_gold", name: "Midnight Gold", description: "Luxurious midnight elegance", icon: "✨",
                       unlockRequirement: -1, unlockText: "Premium Theme Pack",
-                      colors: ThemeColors(cellEmpty: "#1a1400", cellAirplane: "#ffd700", cellHit: "#ff4444",
-                                         cellMiss: "#665500", cellKilled: "#cc0000", gridLine: "#332a00", background: "#0d0a00")),
+                      colors: ThemeColors(cellEmpty: "#1a1400", cellAirplane: "#ffd700", cellHit: "#ff4500",
+                                         cellMiss: "#4a4000", cellKilled: "#cc0000", gridLine: "#332b00", background: "#0d0a00")),
     ]
 
     static func getSkin(_ id: String) -> AirplaneSkinDef? {

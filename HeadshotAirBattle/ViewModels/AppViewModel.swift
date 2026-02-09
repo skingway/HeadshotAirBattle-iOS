@@ -9,6 +9,7 @@ class AppViewModel: ObservableObject {
     @Published var userProfile: UserProfile?
     @Published var isOfflineMode = false
     @Published var errorMessage: String?
+    @Published var successMessage: String?
 
     private let db = Firestore.firestore()
 
@@ -32,7 +33,15 @@ class AppViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
-        // Try Firebase anonymous auth with 5s timeout
+        // Check if already signed in (e.g., Apple-linked user from previous session)
+        if let currentUser = Auth.auth().currentUser {
+            print("[AppViewModel] Existing user found: \(currentUser.uid), anonymous=\(currentUser.isAnonymous)")
+            await loadOrCreateProfile(userId: currentUser.uid)
+            isAuthenticated = true
+            return
+        }
+
+        // No existing user — sign in anonymously
         do {
             let result = try await withTimeout(seconds: 5) {
                 try await Auth.auth().signInAnonymously()
@@ -51,34 +60,34 @@ class AppViewModel: ObservableObject {
     // MARK: - Apple Sign-In
 
     func signInWithApple() async {
+        errorMessage = nil
+        successMessage = nil
+
         do {
+            print("[AppViewModel] Starting Apple Sign-In...")
             let credential = try await AppleSignInService.shared.signIn()
+            print("[AppViewModel] Got Apple credential")
 
-            guard let currentUser = Auth.auth().currentUser else {
-                errorMessage = "No current user session"
-                return
-            }
+            // Save current anonymous user info for potential data migration
+            let previousUserId = Auth.auth().currentUser?.uid
+            let previousProfile = userProfile
+            let wasAnonymous = Auth.auth().currentUser?.isAnonymous ?? true
+            print("[AppViewModel] Previous user: \(previousUserId ?? "nil"), anonymous=\(wasAnonymous)")
 
-            // Try to link anonymous account to Apple credential (preserves UID and data)
-            let authResult: AuthDataResult
-            do {
-                authResult = try await currentUser.link(with: credential)
-                print("[AppViewModel] Successfully linked anonymous account to Apple")
-            } catch let linkError as NSError where linkError.code == AuthErrorCode.credentialAlreadyInUse.rawValue {
-                // Apple account already linked to another Firebase user — switch to that account
-                print("[AppViewModel] Apple account already linked, signing in directly")
-                authResult = try await Auth.auth().signIn(with: credential)
-            } catch {
-                throw error
-            }
-
+            // Sign in with Apple credential directly
+            // - If Apple ID already linked to a Firebase account → signs into that account
+            // - If not linked yet → creates a new Firebase account
+            // This avoids the nonce-consumed issue with link() + fallback signIn()
+            let authResult = try await Auth.auth().signIn(with: credential)
             let userId = authResult.user.uid
+            print("[AppViewModel] Firebase auth complete, userId: \(userId)")
 
-            // Update profile with Apple info
+            // Get Apple info stored by delegate
             let appleDisplayName = UserDefaults.standard.string(forKey: "apple_display_name")
             let appleEmail = UserDefaults.standard.string(forKey: "apple_email")
             let now = Date().timeIntervalSince1970 * 1000
 
+            // Build Firestore update data
             var updateData: [String: Any] = [
                 "authProvider": "apple",
                 "linkedAt": now
@@ -86,17 +95,42 @@ class AppViewModel: ObservableObject {
             if let name = appleDisplayName { updateData["appleDisplayName"] = name }
             if let email = appleEmail { updateData["appleEmail"] = email }
 
-            try await db.collection("users").document(userId).updateData(updateData)
+            // If UID changed (anonymous → existing Apple account), migrate game data
+            if let prevId = previousUserId, prevId != userId, wasAnonymous, let prev = previousProfile {
+                print("[AppViewModel] UID changed from \(prevId) to \(userId), migrating data...")
+                // Merge stats from anonymous profile into Apple account
+                let appleDoc = try? await db.collection("users").document(userId).getDocument()
+                let existingGames = appleDoc?.data()?["totalGames"] as? Int ?? 0
+                if existingGames == 0 && prev.totalGames > 0 {
+                    // Apple account has no games, carry over anonymous stats
+                    updateData["nickname"] = prev.nickname
+                    updateData["totalGames"] = prev.totalGames
+                    updateData["wins"] = prev.wins
+                    updateData["losses"] = prev.losses
+                    updateData["winRate"] = prev.winRate
+                    if let online = prev.onlineGames { updateData["onlineGames"] = online }
+                    updateData["createdAt"] = prev.createdAt
+                }
+                // Clean up old anonymous user data
+                try? await db.collection("users").document(prevId).delete()
+            }
 
-            // Reload profile
+            try await db.collection("users").document(userId).setData(updateData, merge: true)
+            print("[AppViewModel] Firestore updated")
+
+            // Load full profile from Firestore
             await loadOrCreateProfile(userId: userId)
-            userProfile?.authProvider = "apple"
-            userProfile?.appleDisplayName = appleDisplayName
-            userProfile?.appleEmail = appleEmail
-            userProfile?.linkedAt = now
+            var profile = userProfile ?? UserProfile(userId: userId, nickname: generateNickname())
+            profile.userId = userId
+            profile.authProvider = "apple"
+            profile.appleDisplayName = appleDisplayName
+            profile.appleEmail = appleEmail
+            profile.linkedAt = now
+            userProfile = profile  // Full assignment triggers @Published
             saveProfileLocally()
 
-            print("[AppViewModel] Apple Sign-In complete for user: \(userId)")
+            successMessage = "Signed in with Apple"
+            print("[AppViewModel] Apple Sign-In complete for user: \(userId), authProvider: \(userProfile?.authProvider ?? "nil")")
         } catch {
             print("[AppViewModel] Apple Sign-In failed: \(error.localizedDescription)")
             errorMessage = "Sign in failed: \(error.localizedDescription)"

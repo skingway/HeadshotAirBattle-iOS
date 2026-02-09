@@ -48,6 +48,7 @@ struct GameHistoryEntry: Codable, Identifiable {
     var airplaneCount: Int
     var totalTurns: Int
     var completedAt: Double
+    var startedAt: Double?
     var players: [String]
     var playerStats: GameStats?
     var aiStats: GameStats?
@@ -125,6 +126,7 @@ struct OnlineGameState: Codable {
     var turnStartedAt: Double?
     var winner: String?
     var completedAt: Double?
+    var battleStartedAt: Double?
 }
 
 struct GamePlayer: Codable {

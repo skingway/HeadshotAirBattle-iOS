@@ -95,7 +95,7 @@ class StatisticsService {
     func saveGameHistory(userId: String, gameData: GameHistoryEntry) async {
         // Save to Firestore
         do {
-            let data: [String: Any] = [
+            var data: [String: Any] = [
                 "userId": gameData.userId,
                 "gameType": gameData.gameType,
                 "opponent": gameData.opponent,
@@ -116,9 +116,28 @@ class StatisticsService {
                     "kills": gameData.aiStats?.kills ?? 0
                 ]
             ]
+
+            // Include startedAt for duration calculation
+            if let startedAt = gameData.startedAt {
+                data["startedAt"] = startedAt
+            }
+
+            // Include board data for battle reports if available
+            if let playerBoard = gameData.playerBoardData,
+               let encoded = try? JSONEncoder().encode(playerBoard),
+               let json = try? JSONSerialization.jsonObject(with: encoded) as? [String: Any] {
+                data["playerBoardData"] = json
+            }
+            if let aiBoard = gameData.aiBoardData,
+               let encoded = try? JSONEncoder().encode(aiBoard),
+               let json = try? JSONSerialization.jsonObject(with: encoded) as? [String: Any] {
+                data["aiBoardData"] = json
+            }
+
             try await db.collection("gameHistory").addDocument(data: data)
+            NSLog("[StatisticsService] Game history saved to Firestore for userId=\(userId)")
         } catch {
-            print("[StatisticsService] History save error: \(error.localizedDescription)")
+            NSLog("[StatisticsService] History save error: \(error)")
         }
 
         // Save locally (keep last 10)

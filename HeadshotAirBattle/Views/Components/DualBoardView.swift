@@ -17,6 +17,21 @@ struct DualBoardView: View {
         horizontalSizeClass == .regular && verticalSizeClass == .compact
     }
 
+    // Calculate enemy board cell size (must match BoardGridView's calculation)
+    private func enemyCellSize(for boardSize: Int) -> CGFloat {
+        let screenWidth = UIScreen.main.bounds.width
+        let availableWidth = screenWidth - 60
+        let size = availableWidth / CGFloat(boardSize)
+        return min(max(size, GameConstants.GridDisplay.minCellSize), GameConstants.GridDisplay.maxCellSize)
+    }
+
+    // Calculate landscape cell size (must match LandscapeBoardGridView's calculation)
+    private func landscapeCellSize(for boardSize: Int, maxWidth: CGFloat, maxHeight: CGFloat) -> CGFloat {
+        let sizeByWidth = maxWidth / CGFloat(boardSize)
+        let sizeByHeight = maxHeight / CGFloat(boardSize)
+        return min(sizeByWidth, sizeByHeight, 30)
+    }
+
     var body: some View {
         Group {
             if isLandscape {
@@ -58,6 +73,7 @@ struct DualBoardView: View {
                 .padding(.horizontal, 30)
 
                 if let board = viewModel.opponentBoard {
+                    let cellSize = enemyCellSize(for: board.size)
                     BoardGridView(
                         board: board,
                         revealAirplanes: false,
@@ -68,6 +84,26 @@ struct DualBoardView: View {
                         }
                     )
                     .id(refreshTrigger)
+                    .overlay(
+                        Group {
+                            if viewModel.showBombAnimation,
+                               let row = viewModel.pendingAttackRow,
+                               let col = viewModel.pendingAttackCol,
+                               let resultType = viewModel.pendingAttackResultType {
+                                BombDropAnimationView(
+                                    isPlaying: $viewModel.showBombAnimation,
+                                    targetPosition: CGPoint(
+                                        x: 24 + CGFloat(col) * cellSize + cellSize / 2,
+                                        y: 16 + CGFloat(row) * cellSize + cellSize / 2
+                                    ),
+                                    resultType: resultType,
+                                    onComplete: {
+                                        viewModel.proceedAfterPlayerAttack()
+                                    }
+                                )
+                            }
+                        }
+                    )
                 }
             }
 
@@ -179,16 +215,39 @@ struct DualBoardView: View {
                         .padding(.horizontal, 8)
 
                         if let board = viewModel.opponentBoard {
+                            let lMaxWidth = (geometry.size.width - 24) / 2
+                            let lMaxHeight = geometry.size.height - 50
+                            let lCellSize = landscapeCellSize(for: board.size, maxWidth: lMaxWidth, maxHeight: lMaxHeight)
                             LandscapeBoardGridView(
                                 board: board,
                                 revealAirplanes: false,
                                 isInteractive: viewModel.isPlayerTurn,
                                 themeColors: themeColors,
-                                maxWidth: (geometry.size.width - 24) / 2,
-                                maxHeight: geometry.size.height - 50,
+                                maxWidth: lMaxWidth,
+                                maxHeight: lMaxHeight,
                                 refreshTrigger: refreshTrigger,
                                 onCellTap: { row, col in
                                     viewModel.playerAttack(row: row, col: col)
+                                }
+                            )
+                            .overlay(
+                                Group {
+                                    if viewModel.showBombAnimation,
+                                       let row = viewModel.pendingAttackRow,
+                                       let col = viewModel.pendingAttackCol,
+                                       let resultType = viewModel.pendingAttackResultType {
+                                        BombDropAnimationView(
+                                            isPlaying: $viewModel.showBombAnimation,
+                                            targetPosition: CGPoint(
+                                                x: CGFloat(col) * lCellSize + lCellSize / 2,
+                                                y: CGFloat(row) * lCellSize + lCellSize / 2
+                                            ),
+                                            resultType: resultType,
+                                            onComplete: {
+                                                viewModel.proceedAfterPlayerAttack()
+                                            }
+                                        )
+                                    }
                                 }
                             )
                         }
@@ -274,6 +333,12 @@ struct SmallCellView: View {
     let cellSize: CGFloat
     let themeColors: ThemeColors
 
+    @State private var hitPulse: Bool = false
+
+    private var effects: CellEffects {
+        ColorUtils.generateCellEffects(from: themeColors)
+    }
+
     private var cellState: GameConstants.CellState {
         board.getCellState(row: row, col: col)
     }
@@ -286,6 +351,20 @@ struct SmallCellView: View {
         ZStack {
             Rectangle()
                 .fill(backgroundColor)
+                .overlay(
+                    cellState == .hit ?
+                    Rectangle()
+                        .fill(effects.hit.pulseColor)
+                        .opacity(hitPulse ? 0.5 : 0.0)
+                    : nil
+                )
+                .onAppear {
+                    if cellState == .hit {
+                        withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                            hitPulse = true
+                        }
+                    }
+                }
 
             // Show airplane for revealed cells
             if revealAirplanes && hasAirplane {
@@ -300,10 +379,16 @@ struct SmallCellView: View {
                 Circle()
                     .fill(Color.orange)
                     .frame(width: cellSize * 0.5, height: cellSize * 0.5)
+                    .shadow(color: effects.hit.glowColor, radius: 2)
             } else if cellState == .miss {
                 Circle()
-                    .fill(Color.white.opacity(0.6))
-                    .frame(width: cellSize * 0.3, height: cellSize * 0.3)
+                    .fill(effects.miss.dotColor)
+                    .frame(width: cellSize * 0.25, height: cellSize * 0.25)
+            } else if cellState == .killed {
+                Image(systemName: "xmark")
+                    .font(.system(size: cellSize * 0.5, weight: .bold))
+                    .foregroundColor(effects.killed.xColor)
+                    .shadow(color: effects.killed.glowColor, radius: 2)
             }
         }
         .frame(width: cellSize, height: cellSize)
@@ -316,16 +401,16 @@ struct SmallCellView: View {
     private var backgroundColor: Color {
         switch cellState {
         case .empty:
-            return Color(hex: themeColors.cellEmpty)
+            return effects.empty.baseColor
         case .airplane:
             if revealAirplanes {
                 return Color(hex: SkinDefinitions.currentSkinColor()).opacity(0.7)
             }
-            return Color(hex: themeColors.cellEmpty)
+            return effects.empty.baseColor
         case .hit:
             return Color(hex: themeColors.cellHit)
         case .miss:
-            return Color(hex: themeColors.cellMiss)
+            return effects.miss.baseColor
         case .killed:
             return Color(hex: themeColors.cellKilled)
         }
@@ -385,6 +470,12 @@ struct LandscapeCellView: View {
     let cellSize: CGFloat
     let themeColors: ThemeColors
 
+    @State private var hitPulse: Bool = false
+
+    private var effects: CellEffects {
+        ColorUtils.generateCellEffects(from: themeColors)
+    }
+
     private var cellState: GameConstants.CellState {
         board.getCellState(row: row, col: col)
     }
@@ -395,8 +486,7 @@ struct LandscapeCellView: View {
 
     var body: some View {
         ZStack {
-            Rectangle()
-                .fill(backgroundColor)
+            cellBackground
 
             // Show airplane for revealed cells
             if revealAirplanes && hasAirplane {
@@ -411,10 +501,16 @@ struct LandscapeCellView: View {
                 Image(systemName: "flame.fill")
                     .font(.system(size: cellSize * 0.5))
                     .foregroundColor(.orange)
+                    .shadow(color: effects.hit.glowColor, radius: 3)
             } else if cellState == .miss {
                 Circle()
-                    .fill(Color.white.opacity(0.6))
-                    .frame(width: cellSize * 0.3, height: cellSize * 0.3)
+                    .fill(effects.miss.dotColor)
+                    .frame(width: cellSize * 0.25, height: cellSize * 0.25)
+            } else if cellState == .killed {
+                Image(systemName: "xmark")
+                    .font(.system(size: cellSize * 0.6, weight: .bold))
+                    .foregroundColor(effects.killed.xColor)
+                    .shadow(color: effects.killed.glowColor, radius: 4)
             }
         }
         .frame(width: cellSize, height: cellSize)
@@ -424,21 +520,54 @@ struct LandscapeCellView: View {
         )
     }
 
-    private var backgroundColor: Color {
+    @ViewBuilder
+    private var cellBackground: some View {
         switch cellState {
         case .empty:
-            return Color(hex: themeColors.cellEmpty)
+            Rectangle()
+                .fill(effects.empty.baseColor)
+
         case .airplane:
             if revealAirplanes {
-                return Color(hex: SkinDefinitions.currentSkinColor()).opacity(0.7)
+                LinearGradient(
+                    colors: [effects.airplane.gradient.start, effects.airplane.gradient.end],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .shadow(color: effects.airplane.glowColor, radius: 3, x: 0, y: 0)
+            } else {
+                Rectangle()
+                    .fill(effects.empty.baseColor)
             }
-            return Color(hex: themeColors.cellEmpty)
+
         case .hit:
-            return Color(hex: themeColors.cellHit)
+            LinearGradient(
+                colors: [effects.hit.gradient.start, effects.hit.gradient.end],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .overlay(
+                Rectangle()
+                    .fill(effects.hit.pulseColor)
+                    .opacity(hitPulse ? 0.6 : 0.0)
+            )
+            .onAppear {
+                withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                    hitPulse = true
+                }
+            }
+
         case .miss:
-            return Color(hex: themeColors.cellMiss)
+            Rectangle()
+                .fill(effects.miss.baseColor)
+
         case .killed:
-            return Color(hex: themeColors.cellKilled)
+            LinearGradient(
+                colors: [effects.killed.gradient.start, effects.killed.gradient.end],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .shadow(color: effects.killed.glowColor, radius: 4, x: 0, y: 0)
         }
     }
 }

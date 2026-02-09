@@ -17,6 +17,12 @@ class MultiplayerService {
 
     private init() {}
 
+    /// Set game state externally (e.g., from MatchmakingViewModel when game was created/joined outside MultiplayerService)
+    func setGameState(gameId: String, role: String) {
+        self.currentGameId = gameId
+        self.myRole = role
+    }
+
     // MARK: - Create Game
 
     func createGame(hostId: String, hostNickname: String, gameType: String = "privateRoom",
@@ -75,7 +81,8 @@ class MultiplayerService {
         ]
 
         try await ref.child("player2").setValue(playerData)
-        // 不要立即设置 deploying 状态，等双方都 Ready 后再进入部署阶段
+        // Set status to deploying (like Android's MultiplayerService.joinGame)
+        try await ref.child("status").setValue("deploying")
 
         currentGameId = gameId
         myRole = "player2"
@@ -105,7 +112,8 @@ class MultiplayerService {
                 currentTurn: data["currentTurn"] as? String,
                 turnStartedAt: data["turnStartedAt"] as? Double,
                 winner: data["winner"] as? String,
-                completedAt: data["completedAt"] as? Double
+                completedAt: data["completedAt"] as? Double,
+                battleStartedAt: data["battleStartedAt"] as? Double
             )
 
             callback(state)
@@ -220,7 +228,8 @@ class MultiplayerService {
             try await ref.updateChildValues([
                 "status": "battle",
                 "currentTurn": p1Id,
-                "turnStartedAt": Date().millisecondsSince1970
+                "turnStartedAt": Date().millisecondsSince1970,
+                "battleStartedAt": Date().millisecondsSince1970
             ])
         }
     }
