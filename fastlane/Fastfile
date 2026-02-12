@@ -18,7 +18,7 @@ platform :ios do
       xcodeproj: "HeadshotAirBattle.xcodeproj"
     )
 
-    # Build the app
+    # Build the app (automatic signing)
     build_app(
       scheme: "HeadshotAirBattle",
       export_method: "app-store",
@@ -26,11 +26,7 @@ platform :ios do
       output_name: "HeadshotAirBattle.ipa",
       clean: true,
       include_bitcode: false,
-      export_options: {
-        provisioningProfiles: {
-          "com.headshotairbattle" => "com.headshotairbattle AppStore"
-        }
-      }
+      export_xcargs: "-allowProvisioningUpdates"
     )
 
     # Upload to TestFlight

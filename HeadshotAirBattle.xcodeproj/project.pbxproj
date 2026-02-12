@@ -689,7 +689,7 @@
 				CODE_SIGN_ENTITLEMENTS = HeadshotAirBattle/HeadshotAirBattle.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 49;
 				DEVELOPMENT_TEAM = 8J6A847P66;
 				INFOPLIST_FILE = HeadshotAirBattle/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -864,7 +864,7 @@
 				CODE_SIGN_ENTITLEMENTS = HeadshotAirBattle/HeadshotAirBattle.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 49;
 				DEVELOPMENT_TEAM = 8J6A847P66;
 				INFOPLIST_FILE = HeadshotAirBattle/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
