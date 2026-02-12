@@ -64,7 +64,7 @@
 	<key>NSUserTrackingUsageDescription</key>
 	<string>We use your data to provide personalized ads. You can change this in Settings at any time.</string>
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<string>ca-app-pub-3709728062444091~9185840706</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
