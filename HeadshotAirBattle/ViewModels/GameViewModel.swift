@@ -28,6 +28,7 @@ class GameViewModel: ObservableObject {
     private var ai: AIStrategy?
     private var turnTimer: Timer?
     private var userId: String = ""
+    private var isProcessingAttack = false  // 防止快速点击导致多次攻击
 
     var playerAccuracy: Double {
         guard let stats = playerStats else { return 0 }
@@ -123,12 +124,13 @@ class GameViewModel: ObservableObject {
     @Published var showBombAnimation: Bool = false
 
     func playerAttack(row: Int, col: Int) {
-        guard phase == .battle, isPlayerTurn else { return }
+        guard phase == .battle, isPlayerTurn, !isProcessingAttack else { return }
         guard let board = opponentBoard else { return }
 
         // Check already attacked
         if board.isCellAttacked(row: row, col: col) { return }
 
+        isProcessingAttack = true
         stopTurnTimer()
 
         // Process attack to get result
@@ -163,6 +165,7 @@ class GameViewModel: ObservableObject {
 
         // Check win
         if board.areAllAirplanesDestroyed() {
+            isProcessingAttack = false
             endGame(playerWon: true)
             return
         }
@@ -207,17 +210,26 @@ class GameViewModel: ObservableObject {
 
         // Switch back to player
         isPlayerTurn = true
+        isProcessingAttack = false
         startTurnTimer()
     }
 
     // MARK: - Turn Timer
 
     private func startTurnTimer() {
+        // 先清理旧 timer，防止泄漏导致倒计时加速
+        stopTurnTimer()
         turnTimeRemaining = GameConstants.TurnTimer.duration
-        turnTimer = Timer.scheduledTimer(withTimeInterval: GameConstants.TurnTimer.tickInterval, repeats: true) { [weak self] _ in
+        let startTime = Date()
+        turnTimer = Timer.scheduledTimer(withTimeInterval: GameConstants.TurnTimer.tickInterval, repeats: true) { [weak self] timer in
             Task { @MainActor in
-                guard let self = self else { return }
-                self.turnTimeRemaining -= GameConstants.TurnTimer.tickInterval
+                guard let self = self else {
+                    timer.invalidate()
+                    return
+                }
+                // 用实际时间差计算，避免 Task 排队导致的累积误差
+                let elapsed = Date().timeIntervalSince(startTime)
+                self.turnTimeRemaining = max(0, GameConstants.TurnTimer.duration - elapsed)
                 if self.turnTimeRemaining <= 0 {
                     self.handleTurnTimeout()
                 }
@@ -232,18 +244,21 @@ class GameViewModel: ObservableObject {
 
     private func handleTurnTimeout() {
         stopTurnTimer()
-        guard phase == .battle, isPlayerTurn else { return }
+        guard phase == .battle, isPlayerTurn, !isProcessingAttack else { return }
 
-        // Auto-attack random cell
+        // Auto-attack: find a random unattacked cell
         guard let board = opponentBoard else { return }
+        var unattacked: [(Int, Int)] = []
         for row in 0..<boardSize {
             for col in 0..<boardSize {
                 if !board.isCellAttacked(row: row, col: col) {
-                    playerAttack(row: row, col: col)
-                    return
+                    unattacked.append((row, col))
                 }
             }
         }
+        guard !unattacked.isEmpty else { return }
+        let (row, col) = unattacked[Int.random(in: 0..<unattacked.count)]
+        playerAttack(row: row, col: col)
     }
 
     // MARK: - Game End
@@ -255,6 +270,7 @@ class GameViewModel: ObservableObject {
 
     private func endGame(playerWon: Bool) {
         stopTurnTimer()
+        isProcessingAttack = false
         phase = .gameOver
         didPlayerWin = playerWon
 
